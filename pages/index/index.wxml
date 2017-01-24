@@ -1,0 +1,3 @@
+<view>
+    <button type="primary" bindtap="startChat">开始聊天</button>
+</view>
