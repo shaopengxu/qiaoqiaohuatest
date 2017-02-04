@@ -19,6 +19,26 @@ function createUserMessage(content, isMe) {
     return { id: msgUuid(), type: 'speak', content, isMe };
 }
 
+function addInvitorToFriend(){
+  if(app.globalData.invitor){
+    wx.request({
+      url: 'http://weixin/add_friend',
+      data: {openId: openId, friendOpenId: app.globalData.invitor},
+      method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
+      // header: {}, // 设置请求的 header
+      success: function(res){
+        // success
+      },
+      fail: function() {
+        // fail
+      },
+      complete: function() {
+        // complete
+      }
+    })
+  }
+}
+
 Page({
 
     data: {
@@ -32,9 +52,9 @@ Page({
 
     onShareAppMessage: function () {
         return {
-        title: '自定义分享标题',
-        desc: '自定义分享描述',
-        path: 'pages/index/index?id=123'
+            title: '自定义分享标题',
+            desc: '自定义分享描述',
+            path: 'pages/index/index?openId=' + app.globalData.userInfo.nickName
         }
     },
 
@@ -100,8 +120,25 @@ Page({
     },
 
     onLoad: function (params) {
-        console.log('onLoad, params: ' + params.id );
-
+        if(params){
+            app.globalData.invitor = params.openId;
+        }
+        if(app.globalData.isLogin){
+            addInvitorToFriend()
+        }else{
+            wx.redirectTo({
+              url: '../welcome/welcome',
+              success: function(res){
+                // success
+              },
+              fail: function() {
+                // fail
+              },
+              complete: function() {
+                // complete
+              }
+            })
+        }
         var that = this
         //调用应用实例的方法获取全局数据
         app.getUserInfo(function(userInfo){
