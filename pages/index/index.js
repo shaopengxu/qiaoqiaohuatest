@@ -1,6 +1,9 @@
 var app = getApp();
 var Paho = require('../../utils/mqttws31.js');
+const host = require("../../config.js").server_url;
+const mqtt_host = require("../../config.js").mqtt_host;
 
+var that = null;
 /**
  * 生成一条聊天室的消息的唯一 ID
  */
@@ -19,11 +22,33 @@ function createUserMessage(content, isMe) {
     return { id: msgUuid(), type: 'speak', content, isMe };
 }
 
+function getFriendList() {
+    console.log('get friends openId ' + app.globalData.userInfo.openId)
+    wx.request({
+      url: 'http://' + host + '/weixin/get_friends',
+      data: {openId : app.globalData.userInfo.openId},
+      method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
+      // header: {}, // 设置请求的 header
+      success: function(res){
+          console.log('get friends!')
+          console.log('friends : ' + res.data.data.friends);
+        that.setData({users: res.data.data.friends});
+      },
+      fail: function() {
+        // fail
+      },
+      complete: function() {
+        // complete
+      }
+    })
+}
+
 function addInvitorToFriend(){
+    
   if(app.globalData.invitor){
     wx.request({
-      url: 'http://weixin/add_friend',
-      data: {openId: openId, friendOpenId: app.globalData.invitor},
+      url: 'http://' + host + 'weixin/add_friend',
+      data: {openId: app.globalData.userInfo.openId, friendOpenId: app.globalData.invitor},
       method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
       // header: {}, // 设置请求的 header
       success: function(res){
@@ -44,10 +69,7 @@ Page({
     data: {
         motto: 'Hello World',
         userInfo: {},
-        users:[{openId: "testuser1", nickname: "testuser1"},
-               {openId: "testuser2", nickname: "testuser2"},
-               {openId: "testuser3", nickname: "testuser3"}
-            ]
+        users:[]
     },
 
     onShareAppMessage: function () {
@@ -70,8 +92,7 @@ Page({
     enter() {
         console.log("call enter()");
         var time = new Date().getTime()+"";
-        var that = this;
-        app.client = new Paho.MQTT.Client('192.168.1.8', 8080, time)
+        app.client = new Paho.MQTT.Client(mqtt_host, 8080, time)
         app.client.connect({
             useSSL: false,
             cleanSession: false,
@@ -120,11 +141,14 @@ Page({
     },
 
     onLoad: function (params) {
+        that = this;
+        console.log("invitor " + params.openId + ", isLogin " + app.globalData.isLogin);
         if(params){
             app.globalData.invitor = params.openId;
         }
         if(app.globalData.isLogin){
             addInvitorToFriend()
+            getFriendList()
         }else{
             wx.redirectTo({
               url: '../welcome/welcome',
@@ -139,7 +163,6 @@ Page({
               }
             })
         }
-        var that = this
         //调用应用实例的方法获取全局数据
         app.getUserInfo(function(userInfo){
             //更新数据
@@ -152,7 +175,7 @@ Page({
     },
 
     onUnload: function () {
-        app.client.disconnect();
+        this.quit();
     },
     
     startChat: function(event) {

@@ -6,12 +6,15 @@ var openId = "";
 var password = "";
 var passwordConfirm = "";
 
+const host = require("../../config.js").server_url;
+
 
 function loginSuccess(){
     app.globalData.isLogin = true;
-      wx.redirectTo({
+      wx.navigateTo({
         url: '../index/index',
         success: function(res){
+          console.log("login success");
           // success
         },
         fail: function() {
@@ -25,9 +28,10 @@ function loginSuccess(){
 
 function addInvitorToFriend(){
   if(app.globalData.invitor){
+    console.log("invitor: " + app.globalData.invitor);
     wx.request({
-      url: 'http://weixin/add_friend',
-      data: {openId: openId, friendOpenId: app.globalData.invitor},
+      url: 'http://' + host + '/weixin/add_friend',
+      data: {openId: app.globalData.userInfo.openId, friendOpenId: app.globalData.invitor},
       method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
       // header: {}, // 设置请求的 header
       success: function(res){
@@ -61,8 +65,8 @@ Page({
         console.log("come in");
         //TODO 注册用户
         wx.request({
-          url: 'http://weixin/register',
-          data: {openId: openId, password: event.detail.value},
+          url: 'http://' + host + '/weixin/register',
+          data: {openId: openId, password: event.detail.value, nickName: app.globalData.userInfo.nickName},
           method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
           // header: {}, // 设置请求的 header
           success: function(res){
@@ -80,7 +84,7 @@ Page({
       }else{
         //TODO 检查用户密码是否正确
         wx.request({
-          url: 'http://weixin/login',
+          url: 'http://' + host + '/weixin/login',
           data: {openId: openId, password: event.detail.value},
           method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
           // header: {}, // 设置请求的 header
@@ -107,9 +111,10 @@ Page({
       that.setData({
         userInfo:userInfo
       });
+      console.log('get userInfo');
       //请求服务器 该用户是否已经登陆过
       wx.request({
-        url: 'http://192.168.1.8:8081/weixin/check_user_info',
+        url: 'http://' + host + '/weixin/check_user_info',
         data: {nickName: userInfo.nickName},
         method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
         // header: {}, // 设置请求的 header
@@ -118,6 +123,7 @@ Page({
           console.log(res.data.data);
           isFirst = res.data.data.isFirst;
           openId = res.data.data.openId;
+          app.globalData.userInfo.openId = res.data.data.openId;
            
         },
         fail: function() {
