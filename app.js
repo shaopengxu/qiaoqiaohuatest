@@ -32,5 +32,5 @@ App({
     isLogin:false,
     invitor: null
   },
-  client:{}
+  client:null
 })
