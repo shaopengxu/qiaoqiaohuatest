@@ -54,7 +54,7 @@ Page({
                     return m;
                 });
                 that.setData({messages: topicMessages});
-            }, 1000);
+            }, 100);
            
         })
     },

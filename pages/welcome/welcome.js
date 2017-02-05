@@ -11,7 +11,7 @@ const host = require("../../config.js").server_url;
 
 function loginSuccess(){
     app.globalData.isLogin = true;
-      wx.navigateTo({
+      wx.redirectTo({
         url: '../index/index',
         success: function(res){
           console.log("login success");
