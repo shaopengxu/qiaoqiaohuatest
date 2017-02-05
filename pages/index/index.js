@@ -91,6 +91,9 @@ Page({
      */
     enter() {
         console.log("call enter()");
+        if(app.client){
+            return ;
+        }
         var time = new Date().getTime()+"";
         app.client = new Paho.MQTT.Client(mqtt_host, 8080, time)
         app.client.connect({
