@@ -3,7 +3,7 @@
     <scroll-view class="" scroll-y >
         <view wx:for="{{users}}" wx:for-item="user" wx:key="id" id="{{user.openId}}" class="userinfo" bindtap="startChat">
             <view class="user-message other">
-                <!--image class="avatar" src="{{user.avatarUrl}}" mode="aspectFill"></image-->
+                <image class="avatar" src="{{user.avatarUrl}}" mode="aspectFill"></image>
                 <view class="userinfo-nickname">{{user.nickName}}</view>
             </view>
         </view>
