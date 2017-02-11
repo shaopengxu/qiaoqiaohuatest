@@ -8,10 +8,11 @@ App({
     }else{
       //调用登录接口
       wx.login({
-        success: function () {
+        success: function (response) {
           wx.getUserInfo({
             success: function (res) {
               that.globalData.userInfo = res.userInfo
+              that.globalData.userInfo.code = response.code
               typeof cb == "function" && cb(that.globalData.userInfo)
             }
           })

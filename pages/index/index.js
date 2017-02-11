@@ -22,25 +22,50 @@ function createUserMessage(content, isMe) {
     return { id: msgUuid(), type: 'speak', content, isMe };
 }
 
+/**
+ * 获取好友数据
+ */
 function getFriendList() {
-    console.log('get friends openId ' + app.globalData.userInfo.openId)
-    wx.request({
-      url: 'http://' + host + '/weixin/get_friends',
-      data: {openId : app.globalData.userInfo.openId},
-      method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
-      // header: {}, // 设置请求的 header
-      success: function(res){
-          console.log('get friends!')
-          console.log('friends : ' + res.data.data.friends);
-        that.setData({users: res.data.data.friends});
-      },
-      fail: function() {
-        // fail
-      },
-      complete: function() {
-        // complete
-      }
-    })
+    try {
+        //先从本地获取数据
+        var frs = wx.getStorageSync('friends')
+        if (frs) {
+            this.setData({friends : frs});
+            //请求好友数量，如果数量和本地获取的一致，则不需要再从服务器获取数据，否则再从服务器获取好友数据
+            wx.request({
+              url: 'https://' + host + '/weixin/get_friend_size',
+              method: 'GET', 
+              success: function(res){
+                if(res.data.size != frs.length()){
+                    //好友数量和服务器的不一致，重新获取
+                    wx.request({
+                        url: 'http://' + host + '/weixin/get_friends',
+                        method: 'GET', 
+                        success: function(res){
+                            console.log('get friends : ' + res.data.data.friends);
+                            that.setData({friends: res.data.data.friends});
+
+                        },
+                        fail: function() {
+                            // fail
+                        },
+                        complete: function() {
+                            // complete
+                        }
+                    })
+                }
+              },
+              fail: function() {
+                // fail
+              },
+              complete: function() {
+                // complete
+              }
+            })
+        }
+    } catch (e) {
+    // Do something when catch error
+    }
 }
 
 function addInvitorToFriend(){
@@ -69,7 +94,52 @@ Page({
     data: {
         motto: 'Hello World',
         userInfo: {},
-        users:[]
+        friends:[]
+    },
+
+    onLoad: function (params) {
+        that = this;
+        //加载好友
+        getFriendList();
+
+        //连接websocket
+        wx.connectSocket({
+          url: "ws://" ,
+          data: {},
+          // header: {}, // 设置请求的 header
+          method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
+          success: function(res){
+            // success
+          },
+          fail: function() {
+            // fail
+          },
+          complete: function() {
+            // complete
+          }
+        })
+
+        wx.onSocketOpen(function() {
+          // login
+          // 发送请求服务端推送未读消息
+        })
+
+        // 监听websocket的消息
+        wx.onSocketMessage(function(res) {
+           //判断消息类型， 增加好友/批量推送未读消息/推送单条未读消息
+           var data = res.data;
+
+           
+           if(data.type == '2001'){
+                // 增加好友
+           } else if(data.type == '1003'){
+                // 未读消息
+           } else if(data.type == '1004'){
+               // 批量未读消息
+           }
+        })
+        
+        
     },
 
     onShareAppMessage: function () {
@@ -143,39 +213,7 @@ Page({
         }
     },
 
-    onLoad: function (params) {
-        that = this;
-        console.log("invitor " + params.openId + ", isLogin " + app.globalData.isLogin);
-        if(params){
-            app.globalData.invitor = params.openId;
-        }
-        if(app.globalData.isLogin){
-            addInvitorToFriend()
-            getFriendList()
-        }else{
-            wx.redirectTo({
-              url: '../welcome/welcome',
-              success: function(res){
-                // success
-              },
-              fail: function() {
-                // fail
-              },
-              complete: function() {
-                // complete
-              }
-            })
-        }
-        //调用应用实例的方法获取全局数据
-        app.getUserInfo(function(userInfo){
-            //更新数据
-            that.setData({
-                userInfo:userInfo
-            })
-            that.enter();
-        })
-        
-    },
+    
 
     onUnload: function () {
         this.quit();
