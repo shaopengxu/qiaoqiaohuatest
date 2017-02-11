@@ -1,6 +1,5 @@
 <!--index.wxml-->
 <view class="container">
-
   <view class="page-section">
     
     <view class="weui-cells weui-cells_after-title {{hideps}}">
@@ -9,5 +8,5 @@
       </view>
     </view>
   </view>
-  <button type="primary" bindtap="startme" class="openme">开启密语</button>
+  <button bindtap="acceptInvite">接受邀请</button>
 </view>

@@ -6,10 +6,12 @@ var openId = "";
 var password = "";
 var passwordConfirm = "";
 
-const host = require("../../config.js").server_url;
+const host = require("../../config.js").host;
+const http_port = require("../../config.js").http_port;
+const http_server = "http://" + host + ":" + http_port;
 
 
-function loginSuccess(){
+function loginSuccess() {
     app.globalData.isLogin = true;
       wx.redirectTo({
         url: '../index/index',
@@ -26,52 +28,33 @@ function loginSuccess(){
     })
 }
 
-function addInvitorToFriend(){
-  if(app.globalData.invitor){
-    console.log("invitor: " + app.globalData.invitor);
-    wx.request({
-      url: 'http://' + host + '/weixin/add_friend',
-      data: {openId: app.globalData.userInfo.openId, friendOpenId: app.globalData.invitor},
-      method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
-      // header: {}, // 设置请求的 header
-      success: function(res){
-        // success
-      },
-      fail: function() {
-        // fail
-      },
-      complete: function() {
-        // complete
-      }
-    })
-  }
-}
 
 Page({
   data: {
-    motto: 'Hello World',
-    userInfo: {},
     hideps: "hideps"
   },
 
   startme:function(){
     this.setData({hideps:""})
   },
-  inputPassword:function(event){
-    console.log("password: " + event.detail.value);
-    if(event.detail.value.length == 4){
-      //TODO 根据isFirst等信息判断要怎么处理
-      if(isFirst){
-        console.log("come in");
-        //TODO 注册用户
+
+  /**
+   * 输入密码
+   */
+  inputPassword:function(event) {
+    
+    if(event.detail.value.length == 4) {
+      console.log("input password: " + event.detail.value);
+      
+      if(isFirst) {
+        // 注册用户
         wx.request({
-          url: 'http://' + host + '/weixin/register',
-          data: {openId: openId, password: event.detail.value, nickName: app.globalData.userInfo.nickName},
-          method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
-          // header: {}, // 设置请求的 header
-          success: function(res){
+          url: http_server + '/weixin/register',
+          data: {password: event.detail.value, sessionId: app.globalData.sessionId},
+          method: 'GET', 
+          success: function(res) {
+            app.globalData.userInfo.password = event.detail.value;
             loginSuccess();
-            addInvitorToFriend()
           },
           fail: function() {
             // fail
@@ -82,15 +65,15 @@ Page({
         })
 
       }else{
-        //TODO 检查用户密码是否正确
         wx.request({
-          url: 'http://' + host + '/weixin/login',
-          data: {openId: openId, password: event.detail.value},
+          url: http_server + '/weixin/login',
+          data: {password: event.detail.value, sessionId: app.globalData.sessionId},
           method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
           // header: {}, // 设置请求的 header
           success: function(res){
+            app.globalData.userInfo.password = event.detail.value;
+            //TODO 判断是否登录成功
             loginSuccess();
-            addInvitorToFriend()
           },
           fail: function() {
             // fail
@@ -103,27 +86,21 @@ Page({
     }
   },
   onLoad: function () {
-    console.log('onLoad')
     var that = this
     //调用应用实例的方法获取全局数据
     app.getUserInfo(function(userInfo){
-      //更新数据
-      that.setData({
-        userInfo:userInfo
-      });
-      console.log('get userInfo');
       //请求服务器 该用户是否已经登陆过
       wx.request({
-        url: 'http://' + host + '/weixin/check_user_info',
-        data: {nickName: userInfo.nickName},
+        url: http_server + '/weixin/check_user_info',
+        data: {encryptedData: userInfo.encryptedData, iv: userInfo.iv, code: userInfo.code, nickName: userInfo.nickName,
+            sessionId: app.globalData.sessionid},
         method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
         // header: {}, // 设置请求的 header
         success: function(res){
-          // success TODO isFirst openId set value
-          console.log(res.data.data);
           isFirst = res.data.data.isFirst;
-          openId = res.data.data.openId;
           app.globalData.userInfo.openId = res.data.data.openId;
+          app.globalData.sessionId = res.data.data.sessionId;
+
            
         },
         fail: function() {

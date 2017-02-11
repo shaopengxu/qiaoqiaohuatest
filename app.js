@@ -11,6 +11,7 @@ App({
         success: function (response) {
           wx.getUserInfo({
             success: function (res) {
+              
               that.globalData.userInfo = res.userInfo
               that.globalData.userInfo.code = response.code
               typeof cb == "function" && cb(that.globalData.userInfo)
@@ -27,9 +28,35 @@ App({
     logs.unshift(Date.now())
     wx.setStorageSync('logs', logs)
   },
+
+  containsMessage: function(messages, message){
+    if((!messages) || (!message)){
+      return false;
+    }
+    for(var index = 0;index < messages; index++){
+      if(messages[index].messageId == message.messageId){
+        return true;
+      }
+    }
+    return false;
+  },
+
+  getFriendIndexFromList: function(friends, friendOpenId){
+      if ((!friends) || (!friendOpenId)) {
+          return -1;
+      }
+      
+      for (var index = 0; index< friends.length; index++) {
+          if(friends[index].friendOpenId == friendOpenId) {
+              return index;
+          }
+      }
+      return -1;
+  },
   
   globalData:{
     userInfo:null,
+    sessionId: null,
     isLogin:false,
     invitor: null
   },

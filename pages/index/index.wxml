@@ -1,11 +1,14 @@
 <view>
 
     <scroll-view class="" scroll-y >
-        <view wx:for="{{friends}}" wx:for-item="friend" wx:key="id" id="{{friend.openId}}" class="userinfo" bindtap="startChat">
+        <view wx:for="{{friends}}" wx:for-item="friend" wx:key="id" id="{{friend.friendOpenId}}" class="userinfo" bindtap="startChat">
             <view class="user-message other">
                 <!--image class="avatar" src="{{friend.avatarUrl}}" mode="aspectFill"></image -->
-                <view class="userinfo-nickname">{{friend.nickName}}</view>
+                <view class="userinfo-nickname">{{friend.friendNickName}}</view>
             </view>
         </view>
     </scroll-view>
+    <view>
+        <button bindtap="redirectToAddFriend">添加好友</button>
+    </view>
 </view>

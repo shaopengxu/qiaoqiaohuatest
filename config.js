@@ -1,6 +1,7 @@
 var config = {
-    server_url: '172.20.10.9:8081',
-    mqtt_host: '172.20.10.9'
+    host: 'localhost',
+    http_port: 8081,
+    websocket_port: 8887
 };
 
 module.exports = config;
