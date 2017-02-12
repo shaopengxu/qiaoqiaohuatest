@@ -133,14 +133,10 @@ Page({
         friends:[]
     },
 
-    onShow: function() {
-        //加载好友
-        getFriendList();
-    },
     onLoad: function (params) {
         that = this;
-        //加载好友
-        getFriendList();
+        console.log("index page onLoad");
+        
         //连接websocket
         wx.connectSocket({
           url: websocket_server ,
@@ -203,6 +199,9 @@ Page({
     },
 
     onShow: function() {
+        console.log("index page onShow");
+        //加载好友
+        getFriendList();
         // 监听websocket的消息
         wx.onSocketMessage(function(res) {
            //判断消息类型， 增加好友/批量推送未读消息/推送单条未读消息

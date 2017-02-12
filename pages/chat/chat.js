@@ -66,6 +66,25 @@ function receiveMessage(message){
     
 }
 
+function sendMessageRead() {
+
+    wx.request({
+      url: http_server + '/weixin/message_read',
+      data: {friendOpenId: friendUserInfo.openId, sessionId: app.globalData.sessionId},
+      method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
+      // header: {}, // 设置请求的 header
+      success: function(res){
+        // success
+      },
+      fail: function() {
+        // fail
+      },
+      complete: function() {
+        // complete
+      }
+    })
+}
+
 /**
  * 添加好友
  */
@@ -138,9 +157,11 @@ Page({
                 // 未读消息
                 console.log("receive message ! " + data.data);
                 receiveMessage(data.data);
+                sendMessageRead();
            } else if(data.type == '1002'){
                // 批量未读消息
                receiveMessages(data.data);
+               sendMessageRead();
            }
         })
        

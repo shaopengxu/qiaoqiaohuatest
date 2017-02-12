@@ -11,7 +11,7 @@
                 
                 <view class="item-avatar">
                     <image src="{{friend.friendImage}}"></image>
-                    <text class="msgtips">{{friend.unreadSize}}</text>
+                    <text class="msgtips">{{friend.unreadMessageSize}}</text>
                 </view>
                 <view class="item-msgcnt">
                     <text class="title">{{friend.friendNickName}}</text>
