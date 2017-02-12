@@ -205,7 +205,7 @@ Page({
     },
 
     redirectToAddFriend: function(event) {
-        wx.navigateTo({url: '../invite_friend/invite_friend?openId=shaopeng'});
+        wx.navigateTo({url: '../invite_friend/invite_friend'});
     }
 
  

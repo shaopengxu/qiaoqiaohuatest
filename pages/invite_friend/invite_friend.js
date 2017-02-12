@@ -120,7 +120,7 @@ Page({
         return {
             title: '邀请聊天',
             desc: '加入私密聊天',
-            path: 'pages/invite_friend/invite_friend?openId=' + app.globalData.userInfo.nickName
+            path: 'pages/invite_friend/invite_friend?openId=' + app.globalData.userInfo.openId
         }
    },
    acceptInvite: function() {
