@@ -1,0 +1,10 @@
+<view class="container">
+   <view class="bd">
+    <view class="desc">
+        <text>这里，是你和ta最私密的聊天空间</text>
+    </view>
+    <view class="mod-btn-line">
+        <button class="mod-btn ext-btn-blue new-btn-blue">开始密语</button>
+    </view>
+   </view>
+</view>

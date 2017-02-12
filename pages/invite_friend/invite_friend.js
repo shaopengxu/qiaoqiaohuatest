@@ -97,7 +97,8 @@ Page({
       app.globalData.userInfo = userInfo;
       wx.request({
           url: http_server + '/weixin/check_user_info',
-          data: {encryptedData: userInfo.encryptedData, iv: userInfo.iv, code: userInfo.code, nickName: userInfo.nickName},
+          data: {encryptedData: userInfo.encryptedData, iv: userInfo.iv, code: userInfo.code, nickName: userInfo.nickName,
+             avatarUrl: userInfo.avatarUrl},
           method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
           // header: {}, // 设置请求的 header
           success: function(res){

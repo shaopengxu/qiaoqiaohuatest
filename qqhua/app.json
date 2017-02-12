@@ -1,0 +1,23 @@
+{
+  "pages":[
+    "pages/msglist/msglist",
+    "pages/password/password",
+    "pages/invite/invite",
+    "pages/index/index",
+    
+    "pages/person/person",
+    "pages/chat/chat"
+    
+    
+    
+    
+    
+  ],
+  "window":{
+    "backgroundTextStyle":"light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "WeChat",
+    "navigationBarTextStyle":"black"
+  },
+  "debug":true
+}

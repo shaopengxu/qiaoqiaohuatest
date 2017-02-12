@@ -6,24 +6,34 @@
    <view class="scrollview">
     <!--垂直滚动，这里必须设置高度-->
         <scroll-view scroll-y="true" style="height: 400px">
-
-           <view wx:for="{{friends}}" wx:for-item="friend" wx:key="id" id="{{friend.friendOpenId}}" class="item" bindtap="startChat">
-                
+            <view class="item">
                 <view class="item-avatar">
-                    <image src="{{friend.friendImage}}"></image>
-                    <text class="msgtips">{{friend.unreadSize}}</text>
+                    <image src="/res/img/avatar1.png"></image>
+                    <text class="msgtips">11</text>
                 </view>
                 <view class="item-msgcnt">
-                    <text class="title">{{friend.friendNickName}}</text>
-                    <text class="text">{{friend.lastMessage}}</text>
+                    <text class="title">女神</text>
+                    <text class="text">Hi，我来了。</text>
                 </view>
                 <view class="item-date">
-                    <text>{{friend.lastMessageTime}}</text>
+                    <text>2016-07-15</text>
                 </view>
             </view>
-         
+            <view class="item">
+                <view class="item-avatar">
+                    <image src="/res/img/avatar1.png"></image>
+                    <text class="msgtips">11</text>
+                </view>
+                <view class="item-msgcnt">
+                    <text class="title">女神</text>
+                    <text class="text">Hi，我来了。</text>
+                </view>
+                <view class="item-date">
+                    <text>2016-07-15</text>
+                </view>
+            </view>
         </scroll-view>
-        <view class="item-add" bindtap="redirectToAddFriend"></view>
+        <view class="item-add"></view>
     </view>
     <view class="menu">
         <view class="menu-item on"><!--选中加class "on"-->

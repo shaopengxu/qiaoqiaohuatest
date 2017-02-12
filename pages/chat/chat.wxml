@@ -1,10 +1,10 @@
 <view class="page-wrap">
     <scroll-view class="chat-container" scroll-y scroll-into-view="{{lastMessageId}}" scroll-top="9999999999">
-        <view wx:for="{{messages}}" wx:for-item="message" wx:key="id" id="{{message.id}}" class="message {{message.type}}">
+        <view wx:for="{{messages}}" wx:for-item="message" wx:key="id" id="{{message.messageId}}" class="message {{message.type}}">
             <view wx:if="{{message.type == 'speak'}}" class="user-message {{message.isMe ? 'me' : 'other'}}">
                 <!--image class="avatar" src="{{message.user.avatarUrl}}" mode="aspectFill"></image-->
                 <view class="text">
-                    <view class="nickname">{{message.user.nickName}}</view>
+                    <view class="nickname">{{message.isMe? meUserInfo.nickName: friendUserInfo.nickName}}</view>
                     <view class="content">{{message.content}}</view>
                 </view>
             </view>

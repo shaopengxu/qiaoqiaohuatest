@@ -7,15 +7,25 @@ const websocket_server = "ws://" +  host + ":" + websocket_port + "/websocket";
 
 var that = null;
 
+
+function receiveMessages(messages){
+    for(var index= 0;index<messages.length;index++){
+        receiveMessage(messages[index]);
+    }
+}
+
 /**
  * 收到单条消息
  */
-function receiveMessage(message){
+function receiveMessage(message) {
+    if(!message) {
+        return ;
+    }
     message.isMe = message.fromOpenId == app.globalData.userInfo.openId;
     var friendOpenId = message.isMe? message.toOpenId : message.fromOpenId;
     var messages = wx.getStorageInfoSync("messages_" + friendOpenId) || [];
 
-    if(app.containsMessage(messages, message)){
+    if(app.containsMessage(messages, message)) {
         // 已经接受到该消息
         return; 
     }
@@ -64,6 +74,8 @@ function addFriend(friend){
         return ;
     }
     friends.push(friend);
+    wx.setStorageSync('friends', friends);
+    
     if(that){
         that.setData({friends: friends});
     }
@@ -77,40 +89,23 @@ function getFriendList() {
         //先从本地获取数据
         var frs = wx.getStorageSync('friends') ||[];
         that.setData({friends : frs});
-        //请求好友数量，如果数量和本地获取的一致，则不需要再从服务器获取数据，否则再从服务器获取好友数据
         wx.request({
-            url: http_server + '/weixin/get_friend_size',
+            url: http_server + '/weixin/get_friends',
             method: 'GET', 
             data: {sessionId: app.globalData.sessionId},
             success: function(res) {
-                if(res.data.data != frs.length) {
-                    //好友数量和服务器的不一致，重新获取
-                    wx.request({
-                        url: http_server + '/weixin/get_friends',
-                        method: 'GET', 
-                        data: {sessionId: app.globalData.sessionId},
-                        success: function(res){
-                            that.setData({friends: res.data.data});
-                            frs = res.data.data;
-                            wx.setStorageSync('friends', frs);
-                        },
-                        fail: function() {
-                            // fail
-                        },
-                        complete: function() {
-                            // complete
-                        }
-                    })
-                }
+                that.setData({friends: res.data.data});
+                frs = res.data.data;
+                wx.setStorageSync('friends', frs);
             },
             fail: function() {
-            // fail
+                // fail
             },
             complete: function() {
-            // complete
+                // complete
             }
         })
-    
+
     } catch (e) {
         console.log("exception, e " + e);
     // Do something when catch error
@@ -129,7 +124,6 @@ Page({
         that = this;
         //加载好友
         getFriendList();
-        console.log("websocket connectting!, websocket url " + websocket_server);
         //连接websocket
         wx.connectSocket({
           url: websocket_server ,
@@ -137,9 +131,9 @@ Page({
           header:{ 
             'content-type': 'application/json'
           },
-          method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
+          method: 'GET', 
           success: function(res){
-            // success
+      
           },
           fail: function() {
             // fail
@@ -150,29 +144,23 @@ Page({
         })
 
         wx.onSocketOpen(function() {
-          console.log("websocket connected!");
-          var message = {};
-          message.type = "1";
-          message.openId = app.globalData.userInfo.nickName;
-          message.password = app.globalData.userInfo.password;
-          wx.sendSocketMessage({
+            //websocket登录
+            var message = {};
+            message.type = "1";
+            message.openId = app.globalData.userInfo.nickName;
+            message.password = app.globalData.userInfo.password;
+            wx.sendSocketMessage({
             data: JSON.stringify(message),
-            success: function(res){
-              console.log("websocket login success")
+            success: function(res) {
             },
             fail: function() {
-              // fail
+                // fail
             },
             complete: function() {
-              // complete
+                // complete
             }
           })
-          // login
-          // 发送请求服务端推送未读消息
         })
-
-        
-        
     },
 
     onShow: function() {
@@ -185,12 +173,11 @@ Page({
                 // 增加好友
                 addFriend(data.data);
            } else if(data.type == '1001'){
-                //TODO  未读消息
-
+                // 未读消息
                 receiveMessage(data.data);
            } else if(data.type == '1002'){
-               console.log("websocket get message!");
-               //TODO 批量未读消息
+               // 批量未读消息
+                receiveMessages(data.data || []);
            }
         })
     },

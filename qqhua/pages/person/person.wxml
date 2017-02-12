@@ -1,0 +1,46 @@
+<view class="container">
+   <view class="scrollview">
+    <!--垂直滚动，这里必须设置高度-->
+        <scroll-view scroll-y="true" style="height: 400px">
+            <view class="info">
+                <view class="info-avatar">
+                    <image src="/res/img/avatar1.png"></image>
+                </view>
+                <view class="info-msgcnt">
+                    <view>
+                        <text class="title">大雄</text>
+                        <view class="ico-male"></view> <!--男性是ico-male， 女性是ico-female-->
+                    </view>
+                    <text class="text">微信号：Nobita Nobi</text>
+                </view>
+            </view>
+            <view class="links">
+                <view class="link">
+                    <view class="ico-lock"></view>
+                    <view class="link-msgcnt">
+                        <text class="title">修改密码</text>
+                    </view>
+                    <view class="arrow-right"></view>
+                </view>
+                <view class="link">
+                    <view class="ico-msg"></view>
+                    <view class="link-msgcnt">
+                        <text class="title">意见反馈</text>
+                    </view>
+                    <view class="arrow-right"></view>
+                </view>
+            </view>
+            <button class="new-btn-white">安全退出</button>
+        </scroll-view>
+    </view>
+    <view class="menu">
+        <view class="menu-item"><!--选中加class "on"-->
+            <view class="menu-ico ico-msglist"></view>
+            <text>密语</text>
+        </view>
+        <view class="menu-item on"><!--选中加class "on"-->
+            <view class="menu-ico ico-person"></view>
+            <text>我</text>
+        </view>
+    </view>
+</view>

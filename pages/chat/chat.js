@@ -6,12 +6,11 @@ var that = null;
 var meUserInfo = {};
 var friendUserInfo = {};
 
-/**
- * 生成聊天消息
- * 
- */
-function createUserMessage(content, user, isMe) {
-    return { id: msgUuid(), type: 'speak', content, user, isMe };
+
+function receiveMessages(messages){
+    for(var index= 0;index<messages.length;index++){
+        receiveMessage(messages[index]);
+    }
 }
 
 /**
@@ -26,13 +25,19 @@ function receiveMessage(message){
         // 已经接受到该消息
         return; 
     }
-
+    var isThisChat = message.isMe? (message.toOpenId == friendUserInfo.openId)
+           : (message.fromOpenId == friendUserInfo.friendOpenId);
+    
     //删除多余的属性
     delete message.fromOpenId;
     delete message.toOpenId;
-    console.log(messages);
+    message.type = "speak";
     messages.push(message);
     wx.setStorageSync('messages_' + friendOpenId, messages);
+    if(isThisChat){
+        addMessage(message);
+    }
+
     // 获取好友
     var friends = wx.getStorageSync('friends');
     if(!friends){
@@ -50,14 +55,30 @@ function receiveMessage(message){
         friends.push(friend);
         wx.setStorageSync('friends', friends);
     }
-    message.type = "speak";
-    addMessage(message);
+    
+    
 }
 
 function addMessage(message){
     var msgs = that.data.messages;
     msgs.push(message);
     that.setData({messages: msgs});
+}
+
+/**
+ * 添加好友
+ */
+function addFriend(friend) {
+    var friends = wx.getStorageSync('friends');
+    if(!friends){
+        return ;
+    }
+    var friendIndex = app.getFriendIndexFromList(friends, friend.openId);
+    if(friendIndex >= 0) {
+        return ;
+    }
+    friends.push(friend);
+    wx.setStorageSync('friends', friends);
 }
 
 // 声明聊天页面
@@ -70,6 +91,8 @@ Page({
         messages: [],
         inputContent: 'Hi！',
         lastMessageId: 'none',
+        friendUserInfo: {},
+        meUserInfo: {}
     },
 
     /**
@@ -82,7 +105,15 @@ Page({
         // TODO 默认显示最近20条
         // 从服务器检查聊天有没有漏的
         var messages = wx.getStorageSync('messages_' + friendUserInfo.openId) || [];
-        that.setData({messages: messages});
+        console.log("get messages " + 'messages_' + friendUserInfo.openId);
+        that.setData({messages: messages, friendUserInfo: friendUserInfo, meUserInfo: meUserInfo});
+        var lastMessageId = messages.length == 0 ? -1 : messages[messages.length - 1].messageId;
+        wx.request({
+          url: http_server + '/weixin/ask_for_msg_push',
+          data: {lastMessageId: lastMessageId, friendOpenId: friendUserInfo.openId, sessionId: app.globalData.sessionId},
+          method: 'GET'
+         
+        })
     },
 
     onLoad(query) {
@@ -108,6 +139,7 @@ Page({
                 receiveMessage(data.data);
            } else if(data.type == '1002'){
                // 批量未读消息
+               receiveMessages(data.data);
            }
         })
        
