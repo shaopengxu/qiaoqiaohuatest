@@ -18,12 +18,14 @@ function receiveMessages(messages){
  * 收到单条消息
  */
 function receiveMessage(message) {
+    console.log("receiverMessage message id " + message.messageId);
     if(!message) {
         return ;
     }
     message.isMe = message.fromOpenId == app.globalData.userInfo.openId;
+    message.showType = 'speak'
     var friendOpenId = message.isMe? message.toOpenId : message.fromOpenId;
-    var messages = wx.getStorageInfoSync("messages_" + friendOpenId) || [];
+    var messages = wx.getStorageSync("messages_" + friendOpenId) || [];
 
     if(app.containsMessage(messages, message)) {
         // 已经接受到该消息
@@ -34,27 +36,38 @@ function receiveMessage(message) {
     delete message.fromOpenId;
     delete message.toOpenId;
     
-    
     messages.push(message);
-    wx.setStorageSync('messages' + friendOpenId, messages);
+    wx.setStorageSync('messages_' + friendOpenId, messages);
     // 获取好友
     var friends = wx.getStorageSync('friends');
     if(!friends){
         return ;
     }
+    
+    
+
     var friendIndex = app.getFriendIndexFromList(friends, friendOpenId);
     //好友不存在，直接返回
     if(friendIndex < 0) {
         return ;
     }
     var friend = friends[friendIndex];
+    if(friend) {
+        // 更新未读数量
+        if(!friend.unreadSize){
+            friend.unreadSize = 0;
+        }
+        if(!friend.lastMessage){
+            friend.lastMessage = "";
+        }
+        friend.unreadSize = friend.unreadSize + 1;
+        friend.lastMessage = message.content;
+    }
     //  刷新界面，好友的排序升为第一位
     if(friendIndex > 0){
         friends.splice(friendIndex, 1);
         friends.push(friend);
     }
-    // 更新未读数量
-    friend.unreadSize = friend.unreadSize + 1;
     wx.setStorageSync('friends', friends);
     if(that){
         that.setData({friends: friends});
@@ -120,6 +133,10 @@ Page({
         friends:[]
     },
 
+    onShow: function() {
+        //加载好友
+        getFriendList();
+    },
     onLoad: function (params) {
         that = this;
         //加载好友
@@ -141,7 +158,7 @@ Page({
           complete: function() {
             // complete
           }
-        })
+        });
 
         wx.onSocketOpen(function() {
             //websocket登录
@@ -160,6 +177,28 @@ Page({
                 // complete
             }
           })
+        })
+
+        wx.onSocketError(function() {
+            // 重连websocket
+            console.log("websocket error, reconnect");
+            wx.connectSocket({
+                url: websocket_server ,
+                data: {},
+                header:{ 
+                    'content-type': 'application/json'
+                },
+                method: 'GET', 
+                success: function(res){
+            
+                },
+                fail: function() {
+                    // fail
+                },
+                complete: function() {
+                    // complete
+                }
+            });
         })
     },
 

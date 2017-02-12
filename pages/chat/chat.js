@@ -8,7 +8,7 @@ var friendUserInfo = {};
 
 
 function receiveMessages(messages){
-    for(var index= 0;index<messages.length;index++){
+    for(var index= 0;index<messages.length;index++) {
         receiveMessage(messages[index]);
     }
 }
@@ -17,27 +17,34 @@ function receiveMessages(messages){
  * 收到单条消息
  */
 function receiveMessage(message){
+    console.log(" chat receive message id " + message.messageId);
     message.isMe = message.fromOpenId == app.globalData.userInfo.openId;
     var friendOpenId = message.isMe? message.toOpenId : message.fromOpenId;
     var messages = wx.getStorageSync("messages_" + friendOpenId) || [];
 
-    if(app.containsMessage(messages, message)){
-        // 已经接受到该消息
-        return; 
-    }
     var isThisChat = message.isMe? (message.toOpenId == friendUserInfo.openId)
-           : (message.fromOpenId == friendUserInfo.friendOpenId);
-    
+           : (message.fromOpenId == friendUserInfo.openId);
+
     //删除多余的属性
     delete message.fromOpenId;
     delete message.toOpenId;
-    message.type = "speak";
-    messages.push(message);
-    wx.setStorageSync('messages_' + friendOpenId, messages);
-    if(isThisChat){
-        addMessage(message);
+    message.showType = "speak";
+
+    if(app.containsMessage(messages, message)){
+        // 已经接受到该消息
+        console.log("chat message has received")
+        if(isThisChat) {
+            that.setData({messages: messages, lastMessageId : message.messageId});
+        }
+        return; 
     }
 
+    messages.push(message);
+    wx.setStorageSync('messages_' + friendOpenId, messages);
+    console.log("isThisChat " + isThisChat + ", isMe " + message.isMe);
+    if(isThisChat){
+        that.setData({messages: messages, lastMessageId : message.messageId});
+    }
     // 获取好友
     var friends = wx.getStorageSync('friends');
     if(!friends){
@@ -57,12 +64,6 @@ function receiveMessage(message){
     }
     
     
-}
-
-function addMessage(message){
-    var msgs = that.data.messages;
-    msgs.push(message);
-    that.setData({messages: msgs});
 }
 
 /**

@@ -101,6 +101,9 @@ Page({
           app.globalData.userInfo.openId = res.data.data.openId;
           app.globalData.sessionId = res.data.data.sessionId;
 
+          if(isFirst) {
+             wx.clearStorageSync();
+          }
            
         },
         fail: function() {

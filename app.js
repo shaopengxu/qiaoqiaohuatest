@@ -33,7 +33,7 @@ App({
     if((!messages) || (!message)){
       return false;
     }
-    for(var index = 0;index < messages; index++){
+    for(var index = 0;index < messages.length; index++){
       if(messages[index].messageId == message.messageId){
         return true;
       }

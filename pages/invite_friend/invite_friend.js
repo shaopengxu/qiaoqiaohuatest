@@ -23,6 +23,9 @@ function addInvitorToFriend(){
       },
       complete: function() {
         // complete
+        wx.redirectTo({
+          url: '../index/index'
+        })
       }
     })
   }
@@ -42,7 +45,7 @@ Page({
   inputPassword:function(event) {
     
     if(event.detail.value.length == 4) {
-      console.log("input password: " + event.detail.value);
+      console.log("input password: " + event.detail.value + " , isFirst " + isFirst);
       
       if(isFirst) {
         // 注册用户
@@ -100,7 +103,6 @@ Page({
           data: {encryptedData: userInfo.encryptedData, iv: userInfo.iv, code: userInfo.code, nickName: userInfo.nickName,
              avatarUrl: userInfo.avatarUrl},
           method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
-          // header: {}, // 设置请求的 header
           success: function(res){
             isFirst = res.data.data.isFirst;
             app.globalData.userInfo.openId = res.data.data.openId;
