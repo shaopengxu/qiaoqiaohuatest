@@ -97,7 +97,7 @@ page{
 .menu-item.on .ico-msglist{
   background-image: url(/res/img/global/ico_msglist_on.png);
 }
-.menu-item.on .ico-msglist{
+.menu-item.on .ico-person{
   background-image: url(/res/img/global/ico_person_on.png);
 }
 

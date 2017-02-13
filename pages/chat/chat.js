@@ -6,7 +6,9 @@ var that = null;
 var meUserInfo = {};
 var friendUserInfo = {};
 
-
+/**
+ * 收到批量消息
+ */
 function receiveMessages(messages){
     for(var index= 0;index<messages.length;index++) {
         receiveMessage(messages[index]);
@@ -25,11 +27,6 @@ function receiveMessage(message){
     var isThisChat = message.isMe? (message.toOpenId == friendUserInfo.openId)
            : (message.fromOpenId == friendUserInfo.openId);
 
-    //删除多余的属性
-    delete message.fromOpenId;
-    delete message.toOpenId;
-    message.showType = "speak";
-
     if(app.containsMessage(messages, message)){
         // 已经接受到该消息
         console.log("chat message has received")
@@ -45,34 +42,18 @@ function receiveMessage(message){
     if(isThisChat){
         that.setData({messages: messages, lastMessageId : message.messageId});
     }
-    // 获取好友
-    var friends = wx.getStorageSync('friends');
-    if(!friends){
-        return ;
-    }
-    var friendIndex = app.getFriendIndexFromList(friends, friendOpenId);
-    //好友不存在，直接返回
-    if(friendIndex < 0) {
-        return ;
-    }
-    var friend = friends[friendIndex];
-    //  刷新界面，好友的排序升为第一位
-    if(friendIndex > 0){
-        friends.splice(friendIndex, 1);
-        friends.push(friend);
-        wx.setStorageSync('friends', friends);
-    }
-    
     
 }
 
+/**
+ * 发送聊天消息已读
+ */
 function sendMessageRead() {
 
     wx.request({
       url: http_server + '/weixin/message_read',
       data: {friendOpenId: friendUserInfo.openId, sessionId: app.globalData.sessionId},
-      method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
-      // header: {}, // 设置请求的 header
+      method: 'GET',
       success: function(res){
         // success
       },
@@ -109,45 +90,47 @@ Page({
      */
     data: {
         messages: [],
-        inputContent: 'Hi！',
+        inputContent: '',
         lastMessageId: 'none',
-        friendUserInfo: {},
-        meUserInfo: {}
+		friendUserInfo: {},
+		meUserInfo: {}
+		
     },
 
     /**
      * 页面渲染完成后，启动聊天
      */
     onReady() {
-        that = this;
-        meUserInfo = app.globalData.userInfo;
-        // 显示聊天信息
-        // TODO 默认显示最近20条
-        // 从服务器检查聊天有没有漏的
-        var messages = wx.getStorageSync('messages_' + friendUserInfo.openId) || [];
-        console.log("get messages " + 'messages_' + friendUserInfo.openId);
-        that.setData({messages: messages, friendUserInfo: friendUserInfo, meUserInfo: meUserInfo});
-        var lastMessageId = messages.length == 0 ? -1 : messages[messages.length - 1].messageId;
-        wx.request({
-          url: http_server + '/weixin/ask_for_msg_push',
-          data: {lastMessageId: lastMessageId, friendOpenId: friendUserInfo.openId, sessionId: app.globalData.sessionId},
-          method: 'GET'
-         
-        })
     },
 
     onLoad(query) {
         friendUserInfo = query;
+		meUserInfo = app.globalData.userInfo;
+		that = this;
+        wx.setNavigationBarTitle({
+          title: friendUserInfo.nickName
+        })
     },
 
     /**
      * 后续后台切换回前台的时候，也要重新启动聊天
      */
     onShow() {
+		// 显示聊天信息
+        // 聊天记录向上拉，显示从本地存储读出的数据，如果已经读完了，从服务器拉数据
+        var messages = wx.getStorageSync('messages_' + friendUserInfo.openId) || [];
+        that.setData({messages: messages, friendUserInfo: friendUserInfo, meUserInfo: meUserInfo});
+        var lastMessageId = messages.length == 0 ? -1 : messages[messages.length - 1].messageId;
+        wx.request({
+          url: http_server + '/weixin/ask_for_msg_push',
+          data: {lastMessageId: lastMessageId, friendOpenId: friendUserInfo.openId, sessionId: app.globalData.sessionId},
+          method: 'GET'
+        })
+		
         // 监听websocket的消息
         wx.onSocketMessage(function(res) {
+			
            //判断消息类型， 增加好友/批量推送未读消息/推送单条未读消息
-           
            console.log("chat page , websocket get message! data = " + res.data);
            var data = JSON.parse(res.data);
            if(data.type == '2001'){
@@ -171,16 +154,12 @@ Page({
      * 页面卸载时，退出聊天
      */
     onUnload() {
-        console.log("onUnload");
-        
     },
 
     /**
      * 页面切换到后台运行时，退出聊天
      */
     onHide() {
-        console.log("onHide");
-        
     },
 
     
@@ -194,18 +173,20 @@ Page({
     /**
      * 点击「发送」按钮，通过信道推送消息到服务器
      **/
-    sendMessage(e) {
+    sendMessage() {
         var message = {};
         message.data = {};
         message.data.fromOpenId = meUserInfo.openId;
         message.data.toOpenId = friendUserInfo.openId;
         message.data.content = this.data.inputContent;
+		message.data.showType = "speak"
         message.data.type = "1";
         message.type = 1001;
         wx.sendSocketMessage({
           data: JSON.stringify(message),
           success: function(res){
             // success
+			// 信息转圈圈的图标去掉
           },
           fail: function() {
             // fail
@@ -214,5 +195,6 @@ Page({
             // complete
           }
         })
+		this.setData({ inputContent: '' });
     },
 });

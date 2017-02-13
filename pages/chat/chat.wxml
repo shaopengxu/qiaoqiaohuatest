@@ -1,21 +1,49 @@
-<view class="page-wrap">
-    <scroll-view class="chat-container" scroll-y scroll-into-view="{{lastMessageId}}" scroll-top="9999999999">
-        <view wx:for="{{messages}}" wx:for-item="message" wx:key="id" id="{{message.messageId}}" class="message {{message.showType}}">
-            <view wx:if="{{message.showType == 'speak'}}" class="user-message {{message.isMe ? 'me' : 'other'}}">
-                <!--image class="avatar" src="{{message.user.avatarUrl}}" mode="aspectFill"></image-->
-                <view class="text">
-                    <view class="nickname">{{message.isMe? meUserInfo.nickName: friendUserInfo.nickName}}</view>
-                    <view class="content">{{message.content}}</view>
-                </view>
+<view class="container">
+    <view class="scrollview">
+        <scroll-view scroll-y scroll-into-view="message-{{lastMessageId}}" scroll-y="true" style="height: 500px">
+            <view class="date">
+                <text>2017年1月18日 15:27</text>
             </view>
-            <view wx:if="{{message.showType == 'system'}}" class="system-message">
-                {{message.content}}
+            <view wx:for="{{messages}}" wx:for-item="message" wx:key="id" id="message-{{message.messageId}}" class="{{message.isMe ? 'me' : 'friend'}}">
+                <block wx:if="{{message.isMe}}" >
+                    <view class="me">
+                        <view class="wrap">
+                            <view class="words">
+                                <view class="words-arr">
+                                    <view class="words-arr-inn"> </view>
+                                </view>
+                                <text>{{message.content}}</text>
+                                <view class="words-lock"></view>
+                            </view>
+                        </view>
+                        <view class="avatar">
+                            <image src="/res/img/avatar1.png"></image>
+                        </view>
+                    </view>
+                </block> 
+                <block wx:else>
+                    <view class="friend">
+                        <view class="avatar">
+                            <image src="/res/img/avatar1.png"></image>
+                        </view>
+                        <view class="wrap">
+                            <view class="words">
+                                <view class="words-arr">
+                                    <view class="words-arr-inn"> </view>
+                                </view>
+                                <text>{{message.content}}</text>
+                                <view class="words-lock-gray"></view>
+                            </view>
+                        </view>
+                    </view>
+                </block>
             </view>
-        </view>
-    </scroll-view>
-    <view class="input-panel">
-        <button class="pic-icon"></button>
-        <input type="text" value="{{inputContent}}" bindchange="changeInputContent" class="send-input"></input>
-        <button bindtap="sendMessage" class="send-btn">发送</button>
+        </scroll-view>
     </view>
+    <view class="chat-line">
+        <input type="text" class="input" value="{{inputContent}}" bindchange="changeInputContent" bindconfirm="sendMessage"/>
+        <view class="ico-face"></view>
+        <view class="ico-photo"></view>
+    </view>
+
 </view>

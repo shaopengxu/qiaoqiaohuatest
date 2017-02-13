@@ -7,7 +7,9 @@ const websocket_server = "ws://" +  host + ":" + websocket_port + "/websocket";
 
 var that = null;
 
-
+/**
+ * 收到批量消息
+ */
 function receiveMessages(messages){
     for(var index= 0;index<messages.length;index++){
         receiveMessage(messages[index]);
@@ -16,14 +18,16 @@ function receiveMessages(messages){
 
 /**
  * 收到单条消息
+   1 获取本地的消息list，判断是否已经接受该消息
  */
 function receiveMessage(message) {
-    console.log("receiverMessage message id " + message.messageId);
+    
     if(!message) {
         return ;
     }
+	console.log("receiverMessage message id " + message.messageId);
+	
     message.isMe = message.fromOpenId == app.globalData.userInfo.openId;
-    message.showType = 'speak'
     var friendOpenId = message.isMe? message.toOpenId : message.fromOpenId;
     var messages = wx.getStorageSync("messages_" + friendOpenId) || [];
 
@@ -32,10 +36,6 @@ function receiveMessage(message) {
         return; 
     }
 
-    //删除多余的属性
-    delete message.fromOpenId;
-    delete message.toOpenId;
-    
     messages.push(message);
     wx.setStorageSync('messages_' + friendOpenId, messages);
     // 获取好友
@@ -44,8 +44,6 @@ function receiveMessage(message) {
         return ;
     }
     
-    
-
     var friendIndex = app.getFriendIndexFromList(friends, friendOpenId);
     //好友不存在，直接返回
     if(friendIndex < 0) {
@@ -107,12 +105,12 @@ function getFriendList() {
             method: 'GET', 
             data: {sessionId: app.globalData.sessionId},
             success: function(res) {
-                that.setData({friends: res.data.data});
+                that.setData({'friends': res.data.data});
                 frs = res.data.data;
                 wx.setStorageSync('friends', frs);
             },
             fail: function() {
-                // fail
+                app.failHandle();
             },
             complete: function() {
                 // complete
@@ -121,11 +119,30 @@ function getFriendList() {
 
     } catch (e) {
         console.log("exception, e " + e);
-    // Do something when catch error
+		app.failHandle();
     }
 }
 
-
+function wxConnectSocket() {
+	//连接websocket
+	wx.connectSocket({
+	  url: websocket_server ,
+	  data: {},
+	  header:{ 
+		'content-type': 'application/json'
+	  },
+	  method: 'GET', 
+	  success: function(res){
+  
+	  },
+	  fail: function() {
+		app.failHandle();
+	  },
+	  complete: function() {
+		// complete
+	  }
+	});
+}
 
 Page({
 
@@ -136,31 +153,12 @@ Page({
     onLoad: function (params) {
         that = this;
         console.log("index page onLoad");
-        
-        //连接websocket
-        wx.connectSocket({
-          url: websocket_server ,
-          data: {},
-          header:{ 
-            'content-type': 'application/json'
-          },
-          method: 'GET', 
-          success: function(res){
-      
-          },
-          fail: function() {
-            // fail
-          },
-          complete: function() {
-            // complete
-          }
-        });
-
+        wxConnectSocket();
         wx.onSocketOpen(function() {
             //websocket登录
             var message = {};
             message.type = "1";
-            message.openId = app.globalData.userInfo.nickName;
+            message.openId = app.globalData.userInfo.openId;
             message.password = app.globalData.userInfo.password;
             wx.sendSocketMessage({
             data: JSON.stringify(message),
@@ -178,23 +176,7 @@ Page({
         wx.onSocketError(function() {
             // 重连websocket
             console.log("websocket error, reconnect");
-            wx.connectSocket({
-                url: websocket_server ,
-                data: {},
-                header:{ 
-                    'content-type': 'application/json'
-                },
-                method: 'GET', 
-                success: function(res){
-            
-                },
-                fail: function() {
-                    // fail
-                },
-                complete: function() {
-                    // complete
-                }
-            });
+            wxConnectSocket();
         })
     },
 
@@ -224,7 +206,6 @@ Page({
     },
     
     startChat: function(event) {
-        console.log(event);
         var friendOpenId = event.currentTarget.id;
         var friends = wx.getStorageSync('friends');
         if(!friends){

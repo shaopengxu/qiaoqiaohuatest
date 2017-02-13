@@ -54,6 +54,15 @@ App({
       return -1;
   },
   
+  failHandle: function(){
+		wx.showToast({
+		  title: '连接断开，请重新登录',
+		  icon: 'error',
+		  duration: 2000
+		});
+		wx.redirectTo("../welcome/welcome");
+  },
+  
   globalData:{
     userInfo:null,
     sessionId: null,
