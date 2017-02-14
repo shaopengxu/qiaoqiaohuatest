@@ -19,8 +19,6 @@ Page({
     // 页面关闭
   },
   navegateBackToIndex: function(){
-      wx.navigateBack({
-        delta: 1
-      })
-    }
+    wx.redirectTo({url: '../index/index'});
+  }
 })

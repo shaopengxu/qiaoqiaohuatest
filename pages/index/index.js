@@ -206,6 +206,7 @@ Page({
     },
     
     startChat: function(event) {
+        console.log("income talking to friend " + friend)
         var friendOpenId = event.currentTarget.id;
         var friends = wx.getStorageSync('friends');
         if(!friends){
@@ -228,7 +229,7 @@ Page({
     },
 
     redirectToAddFriend: function(event) {
-        wx.navigateTo({url: '../invite_friend/invite_friend'});
+        wx.redirectTo({url: '../invite_friend/invite_friend'});
     }
 
  
