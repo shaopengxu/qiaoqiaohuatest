@@ -1,7 +1,6 @@
 //index.js
 //获取应用实例
 var app = getApp();
-var isFirst = false;
 var openId = "";
 var password = "";
 var passwordConfirm = "";
@@ -31,11 +30,13 @@ function loginSuccess() {
 
 Page({
   data: {
-    hideps: "hideps"
+   
   },
 
   startme:function(){
-    this.setData({hideps:""})
+    wx.navigateTo({
+      url: '../password/password'
+    })
   },
 
   /**
@@ -97,11 +98,11 @@ Page({
         method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
         // header: {}, // 设置请求的 header
         success: function(res){
-          isFirst = res.data.data.isFirst;
+          app.globalData.isFirst = res.data.data.isFirst;
           app.globalData.userInfo.openId = res.data.data.openId;
           app.globalData.sessionId = res.data.data.sessionId;
-
-          if(isFirst) {
+          
+          if(app.globalData.isFirst) {
              wx.clearStorageSync();
           }
            

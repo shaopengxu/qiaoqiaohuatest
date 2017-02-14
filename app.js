@@ -64,9 +64,10 @@ App({
   },
   
   globalData:{
-    userInfo:null,
+    isFirst: false,
+    userInfo: null,
     sessionId: null,
-    isLogin:false,
+    isLogin: false,
     invitor: null
   },
   client:null

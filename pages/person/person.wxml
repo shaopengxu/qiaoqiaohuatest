@@ -1,0 +1,30 @@
+<view class="container">
+   <view class="scrollview">
+    <!--垂直滚动，这里必须设置高度-->
+        <scroll-view scroll-y="true" style="height: 400px">
+            <view class="info">
+                <view class="info-avatar">
+                    <image src="/res/img/avatar1.png"></image>
+                </view>
+                <view class="info-msgcnt">
+                    <view>
+                        <text class="title">大雄</text>
+                        <view class="ico-male"></view> <!--男性是ico-male， 女性是ico-female-->
+                    </view>
+                    <text class="text">微信号：Nobita Nobi</text>
+                </view>
+            </view>
+            <view class="links">
+                <view class="link">
+                    <view class="ico-lock"></view>
+                    <view class="link-msgcnt">
+                        <text class="title">清空聊天记录</text>
+                    </view>
+                    <view class="arrow-right"></view>
+                </view>
+            </view>
+            <button class="new-btn-white">删除好友</button>
+        </scroll-view>
+    </view>
+  
+</view>

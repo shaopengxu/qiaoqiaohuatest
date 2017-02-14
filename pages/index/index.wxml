@@ -30,7 +30,7 @@
             <view class="menu-ico ico-msglist"></view>
             <text>密语</text>
         </view>
-        <view class="menu-item"><!--选中加class "on"-->
+        <view class="menu-item" bindtap="navigateToMe"><!--选中加class "on"-->
             <view class="menu-ico ico-person"></view>
             <text>我</text>
         </view>

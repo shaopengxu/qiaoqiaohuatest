@@ -223,6 +223,10 @@ Page({
         
     },
 
+    navigateToMe: function(){
+        wx.navigateTo({url: '../me/me'});
+    },
+
     redirectToAddFriend: function(event) {
         wx.navigateTo({url: '../invite_friend/invite_friend'});
     }

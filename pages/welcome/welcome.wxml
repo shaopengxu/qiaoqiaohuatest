@@ -1,13 +1,10 @@
-<!--index.wxml-->
-<view class="container">
-
-  <view class="page-section">
-    
-    <view class="weui-cells weui-cells_after-title {{hideps}}">
-      <view class="weui-cell weui-cell_input">
-        <input class="weui-input" password type="text" placeholder="输入密码" bindinput="inputPassword"/>
-      </view>
+<view class="container" style="background-image:url(/res/img/index/bg.png) no-repeat">
+   <view class="bd">
+    <view class="desc">
+        <text>这里，是你和ta最私密的聊天空间</text>
     </view>
-  </view>
-  <button type="primary" bindtap="startme" class="openme">开启密语</button>
+    <view class="mod-btn-line">
+        <button class="mod-btn ext-btn-blue new-btn-blue" bindtap="startme">开始密语</button>
+    </view>
+   </view>
 </view>
