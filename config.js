@@ -1,6 +1,7 @@
 var config = {
     //host: 'localhost',
-    host: 'www.pengyoumiyu.com'
+    http_server: 'https://www.pengyoumiyu.com',
+    ws_server: 'wss://www.pengyoumiyu.com/ws'
 };
 
 module.exports = config;

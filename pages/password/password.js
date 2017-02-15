@@ -1,6 +1,5 @@
 var app = getApp();
-const host = require("../../config.js").host;
-const http_server = "https://" + host;
+const http_server = require("../../config.js").http_server;
 
 var password1 = ""
 var password2 = ""

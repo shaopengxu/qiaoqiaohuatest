@@ -12,9 +12,9 @@ App({
           wx.getUserInfo({
             success: function (res) {
               console.log("ws.login return code = " + response.code);
-              console.log("ws.getUserInfo return encryptData " + res.encryptData);
+              console.log("ws.getUserInfo return encryptedData " + res.encryptedData);
               that.globalData.userInfo = res.userInfo
-              that.globalData.encryptData = res.encryptData
+              that.globalData.encryptedData = res.encryptedData
               that.globalData.iv = res.iv
               that.globalData.code = response.code
               typeof cb == "function" && cb(that.globalData.userInfo)
@@ -72,7 +72,7 @@ App({
     sessionId: null,
     isLogin: false,
     invitor: null,
-    encryptData: null,
+    encryptedData: null,
     iv: null,
     code: null
   },
