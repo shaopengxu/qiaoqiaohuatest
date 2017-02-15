@@ -3,6 +3,7 @@ const http_server = require("../../config.js").http_server;
 
 var password1 = ""
 var password2 = ""
+var needAddFriend = false;
 
   /**
    * 输入密码
@@ -16,8 +17,13 @@ var password2 = ""
         data: {password: password, sessionId: app.globalData.sessionId},
         method: 'GET', 
         success: function(res) {
+          app.globalData.isLogin = true;
           app.globalData.userInfo.password = password;
-          loginSuccess();
+          if(needAddFriend){
+              app.addInvitorToFriend(loginSuccess);
+          }else{
+            loginSuccess()
+          }
         },
         fail: function() {
           // fail
@@ -34,9 +40,17 @@ var password2 = ""
         method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
         // header: {}, // 设置请求的 header
         success: function(res){
-          app.globalData.userInfo.password = password;
           //TODO 判断是否登录成功
-          loginSuccess();
+
+          app.globalData.isLogin = true;
+          app.globalData.userInfo.password = password;
+          
+          if(needAddFriend){
+              app.addInvitorToFriend(loginSuccess);
+          }else{
+            loginSuccess()
+          }
+          
         },
         fail: function() {
           // fail
@@ -50,11 +64,11 @@ var password2 = ""
   }
 
   function loginSuccess() {
-    app.globalData.isLogin = true;
+    
       wx.redirectTo({
         url: '../index/index',
         success: function(res){
-          // success
+          
         },
         fail: function() {
           // fail
@@ -77,9 +91,12 @@ Page({
     input4: '',
     tip:"密码输入错误超过5次，请10分钟后重新尝试"
   },
-  onLoad:function(options) {
+  onLoad:function(data) {
       if(app.globalData.isFirst){
           this.setData({tip: '请设置登录密码'});
+      }
+      if(data && data.needAddFriend){
+          needAddFriend = true;
       }
   },
   onReady:function(){
@@ -107,7 +124,7 @@ Page({
   input4Change: function(e){
     password1 = this.data.input1 + this.data.input2 + this.data.input3 + e.detail.value;
     if(app.globalData.isFirst){
-
+        inputPassword(password1);
     }else{
         inputPassword(password1);
     }

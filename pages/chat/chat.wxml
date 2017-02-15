@@ -41,7 +41,7 @@
         </scroll-view>
     </view>
     <view class="chat-line">
-        <input type="text" class="input" value="{{inputContent}}" bindchange="changeInputContent" bindconfirm="sendMessage"/>
+        <input type="text" class="input" bindchange="changeInputContent" bindconfirm="sendMessage"/>
         <view class="ico-face"></view>
         <view class="ico-photo"></view>
     </view>

@@ -171,13 +171,13 @@ Page({
     /**
      * 点击「发送」按钮，通过信道推送消息到服务器
      **/
-    sendMessage() {
-        console.log("message content: " + this.data.inputContent);
+    sendMessage(e) {
+        console.log("message content: " + e.detail.value);
         var message = {};
         message.data = {};
         message.data.fromOpenId = meUserInfo.openId;
         message.data.toOpenId = friendUserInfo.openId;
-        message.data.content = this.data.inputContent;
+        message.data.content = e.detail.value;
 		message.data.showType = "speak"
         message.data.type = "1";
         message.type = 1001;
@@ -188,13 +188,14 @@ Page({
 			// 信息转圈圈的图标去掉
           },
           fail: function() {
-            // fail
+            app.wxConnectSocket();
           },
           complete: function() {
             // complete
-            that.setData({ inputContent: '' });
+            //that.setData({ inputContent: ''});
           }
         })
+        return {value : '' , cursor : 0};
 		
     },
 });

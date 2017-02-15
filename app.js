@@ -56,6 +56,35 @@ App({
       }
       return -1;
   },
+
+  /**
+ * 邀请好友
+ */
+addInvitorToFriend: function(callbackFunc){
+  var http_server = require("config.js").http_server;
+  var that = this;
+  console.log("addInvitorToFriend   in line 63");
+  if(this.globalData.friend){
+    console.log("addInvitorToFriend   in line 65");
+    wx.request({
+      url: http_server + '/weixin/add_friend',
+      data: {friendOpenId: this.globalData.friend.openId, sessionId: this.globalData.sessionId},
+      method: 'GET',
+      success: function(res){
+        // success
+        that.globalData.res =res;
+        callbackFunc()
+
+      },
+      fail: function() {
+        // fail
+      },
+      complete: function() {
+        
+      }
+    })
+  }
+},
   
   failHandle: function(){
 		wx.showToast({
@@ -63,18 +92,69 @@ App({
 		  icon: 'error',
 		  duration: 2000
 		});
-		wx.redirectTo("../welcome/welcome");
+		wx.navigateBack({
+      delta: 1
+    });
   },
+
+  websocketOpen: function(){
+    var that =this;
+    wx.onSocketOpen(function() {
+          //websocket登录
+          var message = {};
+          message.type = "1";
+          message.openId = that.globalData.userInfo.openId;
+          message.password = that.globalData.userInfo.password;
+          wx.sendSocketMessage({
+          data: JSON.stringify(message),
+          success: function(res) {
+          },
+          fail: function() {
+              // fail
+          },
+          complete: function() {
+              // complete
+          }
+        })
+      })
+  },
+
+  wxConnectSocket: function() {
+    var that = this;
+    var websocket_server = require("config.js").ws_server;
+      //连接websocket
+      wx.connectSocket({
+        url: websocket_server ,
+        data: {},
+        header:{ 
+        'content-type': 'application/json'
+        },
+        method: 'GET', 
+        success: function(res){
+            that.socketOpen = true;
+            that.websocketOpen();
+        },
+        fail: function() {
+          that.failHandle();
+        },
+        complete: function() {
+        // complete
+        }
+      });
+   },
   
   globalData:{
-    isFirst: false,
+    isFirst: true,
     userInfo: null,
     sessionId: null,
     isLogin: false,
     invitor: null,
     encryptedData: null,
     iv: null,
-    code: null
+    code: null,
+    friend: null,
+    res: null,
+    socketOpen : false
   },
   client:null
 })

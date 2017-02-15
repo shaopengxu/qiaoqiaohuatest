@@ -3,6 +3,7 @@ const http_server = require("../../config.js").http_server;
 const websocket_server = require("../../config.js").ws_server;
 
 var that = null;
+var socketOpen = false;
 
 /**
  * 收到批量消息
@@ -120,27 +121,6 @@ function getFriendList() {
     }
 }
 
-function wxConnectSocket() {
-	//连接websocket
-	wx.connectSocket({
-	  url: websocket_server ,
-	  data: {},
-	  header:{ 
-		'content-type': 'application/json'
-	  },
-	  method: 'GET', 
-	  success: function(res){
-  
-	  },
-	  fail: function() {
-		app.failHandle();
-	  },
-	  complete: function() {
-		// complete
-	  }
-	});
-}
-
 Page({
 
     data: {
@@ -149,31 +129,16 @@ Page({
 
     onLoad: function (params) {
         that = this;
-        console.log("index page onLoad");
-        wxConnectSocket();
-        wx.onSocketOpen(function() {
-            //websocket登录
-            var message = {};
-            message.type = "1";
-            message.openId = app.globalData.userInfo.openId;
-            message.password = app.globalData.userInfo.password;
-            wx.sendSocketMessage({
-            data: JSON.stringify(message),
-            success: function(res) {
-            },
-            fail: function() {
-                // fail
-            },
-            complete: function() {
-                // complete
-            }
-          })
-        })
+        if(!app.socketOpen){
+            app.wxConnectSocket();
+        }
+        
+        
 
         wx.onSocketError(function() {
             // 重连websocket
             console.log("websocket error, reconnect");
-            wxConnectSocket();
+            //wxConnectSocket();
         })
     },
 
@@ -226,7 +191,7 @@ Page({
     },
 
     redirectToAddFriend: function(event) {
-        wx.redirectTo({url: '../invite_friend/invite_friend'});
+        wx.navigateTo({url: '../invite_friend/invite_friend'});
     }
 
  

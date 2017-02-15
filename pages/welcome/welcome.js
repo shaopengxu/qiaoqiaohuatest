@@ -8,6 +8,10 @@ Page({
   },
 
   startme:function(){
+    //TODO  for teset
+    //app.globalData.friend = {};
+    //app.globalData.friend.openId = "shaopeng"
+    
     wx.navigateTo({
       url: '../password/password'
     })

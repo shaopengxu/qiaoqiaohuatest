@@ -8,8 +8,7 @@
     "pages/me/me",
     "pages/chat/chat",
     "pages/logs/logs",
-    "pages/invite_friend/invite_friend",
-    "pages/be_invited_friend/be_invited_friend"
+    "pages/invite_friend/invite_friend"
   ],
   "window":{
     "backgroundTextStyle":"light",

@@ -5,9 +5,18 @@
     <image class="avatar" src="/res/img/avatar2.png"></image>
    </view>
    <view class="desc">
-    <text>确认无误点击开启私密聊天</text>
+    <block wx:if="{{invite}}">
+        <text>密语好友邀请</text>
+    </block>
+    <block wx:else>
+        <text>确认无误点击开启私密聊天</text>
+    </block>
+    
    </view>
-   <view class="mod-btn-line">
-    <button class="mod-btn ext-btn-blue"  bindtap="acceptInvite">开始密语</button>
-   </view>
+   <block wx:if="{{!invite}}">
+        <view class="mod-btn-line">
+            <button class="mod-btn ext-btn-blue"  bindtap="acceptInvite">开始密语</button>
+        </view>
+    </block>
+   
 </view>

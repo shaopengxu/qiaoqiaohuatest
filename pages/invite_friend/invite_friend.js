@@ -1,42 +1,15 @@
 var app = getApp()
 const http_server = require("../../config.js").http_server;
 
-var friend = null;
 var isFirst = true;
 
-/**
- * 邀请好友
- */
-function addInvitorToFriend(){
-  if(friend){
-    wx.request({
-      url: http_server + '/weixin/add_friend',
-      data: {friendOpenId: friend.openId, sessionId: app.globalData.sessionId},
-      method: 'GET',
-      success: function(res){
-        // success
-      },
-      fail: function() {
-        // fail
-      },
-      complete: function() {
-        // complete
-        wx.redirectTo({
-          url: '../index/index'
-        })
-      }
-    })
-  }
-}
+
 
 Page({
   data: {
-    hideps: "hideps"
+    invite: true
   },
 
-  startme:function(){
-    this.setData({hideps:""})
-  },
   /**
    * 输入密码
    */
@@ -86,26 +59,26 @@ Page({
   },
 
   onLoad: function (data) {
-    console.log("invite_friend page, data = " + data.openId);
-    var that = this
-    friend = data;
-    //调用应用实例的方法获取全局数据
-    app.getUserInfo(function(userInfo){
-      //更新数据
-      that.setData({
-        userInfo:userInfo
-      })
-      app.globalData.userInfo = userInfo;
-      wx.request({
+    if(data && data.openId){
+      console.log("invite_friend page, data = " + data.openId);
+      this.setData({invite: false})
+      app.globalData.friend = data;
+      app.getUserInfo(function(userInfo){
+        //更新数据
+        wx.request({
           url: http_server + '/weixin/check_user_info',
-          data: {encryptedData: userInfo.encryptedData, iv: userInfo.iv, code: userInfo.code, nickName: userInfo.nickName,
-             avatarUrl: userInfo.avatarUrl},
+          data: {encryptedData: app.globalData.encryptedData, iv: app.globalData.iv, code: app.globalData.code, nickName: userInfo.nickName,
+              avatarUrl: userInfo.avatarUrl},
           method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
+          // header: {}, // 设置请求的 header
           success: function(res){
-            isFirst = res.data.data.isFirst;
+            app.globalData.isFirst = res.data.data.isFirst;
             app.globalData.userInfo.openId = res.data.data.openId;
             app.globalData.sessionId = res.data.data.sessionId;
             
+            if(app.globalData.isFirst) {
+              wx.clearStorageSync();
+            }
           },
           fail: function() {
             // fail
@@ -114,7 +87,11 @@ Page({
             // complete
           }
         })
-    })
+      })
+    }else{
+      this.setData({invite: true})
+      
+    }
   },
   onShareAppMessage: function () {
         return {
@@ -124,7 +101,14 @@ Page({
         }
    },
    acceptInvite: function() {
-       this.setData({hideps:""})
+       if(app.globalData.isLogin){
+          app.addInvitorToFriend();
+       }else{
+         wx.navigateTo({
+           url: '../password/password?needAddFriend=true'
+         })
+       }
+       
    }
 
 })
