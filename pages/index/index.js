@@ -23,7 +23,7 @@ function receiveMessage(message) {
     if(!message) {
         return ;
     }
-	console.log("receiverMessage message id " + message.messageId);
+	//console.log("receiverMessage message id " + message.messageId);
 	
     message.isMe = message.fromOpenId == app.globalData.userInfo.openId;
     var friendOpenId = message.isMe? message.toOpenId : message.fromOpenId;

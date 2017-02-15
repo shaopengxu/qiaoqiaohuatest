@@ -17,7 +17,7 @@ function receiveMessages(messages){
  * 收到单条消息
  */
 function receiveMessage(message){
-    console.log(" chat receive message id " + message.messageId);
+    //console.log(" chat receive message id " + message.messageId);
     message.isMe = message.fromOpenId == app.globalData.userInfo.openId;
     var friendOpenId = message.isMe? message.toOpenId : message.fromOpenId;
     var messages = wx.getStorageSync("messages_" + friendOpenId) || [];
@@ -27,7 +27,7 @@ function receiveMessage(message){
 
     if(app.containsMessage(messages, message)){
         // 已经接受到该消息
-        console.log("chat message has received")
+        //console.log("chat message has received")
         if(isThisChat) {
             that.setData({messages: messages, lastMessageId : message.messageId});
         }
@@ -36,7 +36,7 @@ function receiveMessage(message){
 
     messages.push(message);
     wx.setStorageSync('messages_' + friendOpenId, messages);
-    console.log("isThisChat " + isThisChat + ", isMe " + message.isMe);
+    //console.log("isThisChat " + isThisChat + ", isMe " + message.isMe);
     if(isThisChat){
         that.setData({messages: messages, lastMessageId : message.messageId});
     }
@@ -99,15 +99,16 @@ Page({
      * 页面渲染完成后，启动聊天
      */
     onReady() {
+        wx.setNavigationBarTitle({
+          title: friendUserInfo.nickName
+        })
     },
 
     onLoad(query) {
         friendUserInfo = query;
 		meUserInfo = app.globalData.userInfo;
 		that = this;
-        wx.setNavigationBarTitle({
-          title: friendUserInfo.nickName
-        })
+        
     },
 
     /**
