@@ -11,9 +11,12 @@ App({
         success: function (response) {
           wx.getUserInfo({
             success: function (res) {
-              
+              console.log("ws.login return code = " + response.code);
+              console.log("ws.getUserInfo return encryptData " + res.encryptData);
               that.globalData.userInfo = res.userInfo
-              that.globalData.userInfo.code = response.code
+              that.globalData.encryptData = res.encryptData
+              that.globalData.iv = res.iv
+              that.globalData.code = response.code
               typeof cb == "function" && cb(that.globalData.userInfo)
             }
           })
@@ -68,7 +71,10 @@ App({
     userInfo: null,
     sessionId: null,
     isLogin: false,
-    invitor: null
+    invitor: null,
+    encryptData: null,
+    iv: null,
+    code: null
   },
   client:null
 })

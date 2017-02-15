@@ -1,7 +1,6 @@
 var app = getApp()
 const host = require("../../config.js").host;
-const http_port = require("../../config.js").http_port;
-const http_server = "http://" + host + ":" + http_port;
+const http_server = "https://" + host;
 
 var friend = null;
 var isFirst = true;

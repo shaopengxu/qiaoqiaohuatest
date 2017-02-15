@@ -1,14 +1,7 @@
-//index.js
-//获取应用实例
 var app = getApp();
 
 const host = require("../../config.js").host;
-const http_port = require("../../config.js").http_port;
-const http_server = "http://" + host + ":" + http_port;
-
-
-
-
+const http_server = "https://" + host;
 
 Page({
   data: {
@@ -28,7 +21,7 @@ Page({
       //请求服务器 该用户是否已经登陆过
       wx.request({
         url: http_server + '/weixin/check_user_info',
-        data: {encryptedData: userInfo.encryptedData, iv: userInfo.iv, code: userInfo.code, nickName: userInfo.nickName,
+        data: {encryptedData: app.globalData.encryptedData, iv: app.globalData.iv, code: app.globalData.code, nickName: userInfo.nickName,
              avatarUrl: userInfo.avatarUrl},
         method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
         // header: {}, // 设置请求的 header
@@ -40,7 +33,6 @@ Page({
           if(app.globalData.isFirst) {
              wx.clearStorageSync();
           }
-           
         },
         fail: function() {
           // fail

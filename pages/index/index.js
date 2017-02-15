@@ -1,9 +1,7 @@
 var app = getApp();
 const host = require("../../config.js").host;
-const http_port = require("../../config.js").http_port;
-const http_server = "http://" + host + ":" + http_port;
-const websocket_port = require("../../config.js").websocket_port;
-const websocket_server = "ws://" +  host + ":" + websocket_port + "/websocket";
+const http_server = "https://" + host;
+const websocket_server = "wss://" +  host + "/ws";
 
 var that = null;
 

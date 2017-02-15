@@ -1,7 +1,6 @@
 var app = getApp();
 const host = require("../../config.js").host;
-const http_port = require("../../config.js").http_port;
-const http_server = "http://" + host + ":" + http_port;
+const http_server = "https://" + host;
 var that = null;
 var meUserInfo = {};
 var friendUserInfo = {};
@@ -174,6 +173,7 @@ Page({
      * 点击「发送」按钮，通过信道推送消息到服务器
      **/
     sendMessage() {
+        console.log("message content: " + this.data.inputContent);
         var message = {};
         message.data = {};
         message.data.fromOpenId = meUserInfo.openId;
@@ -193,8 +193,9 @@ Page({
           },
           complete: function() {
             // complete
+            that.setData({ inputContent: '' });
           }
         })
-		this.setData({ inputContent: '' });
+		
     },
 });
