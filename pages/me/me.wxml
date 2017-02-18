@@ -36,12 +36,12 @@
         </scroll-view>
     </view>
     <view class="menu">
-        <view class="menu-item" bindtap="navegateBackToIndex"><!--选中加class "on"-->
-            <view class="menu-ico ico-msglist"></view>
+        <view class="menu-item"  bindtap="navegateBackToIndex"><!--选中加class "on"-->
+            <image class="menu-ico ico-msglist" src="/res/img/global/ico_msglist.png"></image><!--选中/res/img/global/ico_msglist_on.png-->
             <text>密语</text>
         </view>
-        <view class="menu-item on"><!--选中加class "on"-->
-            <view class="menu-ico ico-person"></view>
+        <view class="menu-item on"  bindtap="navigateToMe"><!--选中加class "on"-->
+            <image class="menu-ico ico-person" src="/res/img/global/ico_person_on.png"></image><!--选中/res/img/global/ico_person_on.png-->
             <text>我</text>
         </view>
     </view>

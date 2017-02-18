@@ -6,6 +6,7 @@
     width: 100%;
     padding: 0rpx 20rpx 0;
     box-sizing: border-box;
+    overflow: hidden;
 }
 .date{
     font-size: 24rpx;
@@ -87,8 +88,6 @@
     bottom:-10%;
     width: 80rpx;
     height: 110rpx;
-    background: url(/res/img/chat/chat_bg.png) no-repeat;
-    background-size: 80rpx auto;
 }
 .words-lock-gray{
     position: absolute;
@@ -96,8 +95,6 @@
     bottom:-10%;
     width: 80rpx;
     height: 110rpx;
-    background: url(/res/img/chat/chat_bg_gray.png)  no-repeat;
-    background-size: 80rpx auto;
 }
 .me .words-arr{
     position: absolute;
@@ -141,15 +138,11 @@
 .chat-line .ico-face{
     width: 56rpx;
     height: 56rpx;
-    background: url(/res/img/chat/ico_face.png) no-repeat;
-    background-size: 100% auto;
     margin-left: 26rpx;
 }
 .chat-line .ico-photo{
     width: 56rpx;
     height: 56rpx;
-    background: url(/res/img/chat/ico_photo.png) no-repeat;
-    background-size: 100% auto;
     margin-left: 12rpx;
 }
 

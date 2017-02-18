@@ -1,11 +1,11 @@
 var app = getApp();
 const http_server = require("../../config.js").http_server;
 
-var password1 = ""
-var password2 = ""
+var password = ""
 var needAddFriend = false;
 var backGround = false;
 var urlAfterFromBackGround = "";
+var currentFocus = 1;
 
 
   /**
@@ -100,12 +100,20 @@ var urlAfterFromBackGround = "";
     })
   }
 
+  function updateField(that, number){
+    if(currentFocus == 1){
+      that.setData({"input1": number});
+    }else if(currentFocus == 2){
+      that.setData({"input2": number});
+    }else if(currentFocus == 3){
+      that.setData({"input3": number});
+    }else if(currentFocus == 4){
+      that.setData({"input4": number});
+    }
+  }
+
 Page({
   data:{
-    focus1: true,
-    focus2: false,
-    focus3: false,
-    focus4: false,
     input1: '',
     input2: '',
     input3: '',
@@ -136,22 +144,123 @@ Page({
   onUnload:function(){
     // 页面关闭
   },
-  input1Change: function(e){
-    //this.setData({focus1: false, focus2: true, focus3: false, focus4: false, input1: e.detail.value})
-    inputPassword(e.detail.value +  "234");
-  },
-  input2Change: function(e){
-    this.setData({focus1: false, focus2: false, focus3: true, focus4: false, input2: e.detail.value})
-  },
-  input3Change: function(e){
-    this.setData({focus1: false, focus2: false, focus3: false, focus4: true, input3: e.detail.value})
-  },
-  input4Change: function(e){
-    password1 = this.data.input1 + this.data.input2 + this.data.input3 + e.detail.value;
-    if(app.globalData.isFirst){
-        inputPassword(password1);
+  click1: function(){
+    updateField(this, "1");
+    password = password + "1";
+    if(currentFocus == 4){
+      inputPassword(password);
+      currentFocus = 0
     }else{
-        inputPassword(password1);
+      currentFocus ++;
     }
+    
+  },
+  click2: function(){
+    updateField(this, "2");
+    password = password + "2";
+    if(currentFocus == 4){
+      inputPassword(password);
+      currentFocus = 0
+    }else{
+      currentFocus ++;
+    }
+    
+  },
+  click3: function(){
+    updateField(this, "3");
+    password = password + "3";
+    if(currentFocus == 4){
+      inputPassword(password);
+      currentFocus = 0
+    }else{
+      currentFocus ++;
+    }
+    
+  },
+  click4: function(){
+    updateField(this, "4");
+    password = password + "4";
+    if(currentFocus == 4){
+      inputPassword(password);
+      currentFocus = 0
+    }else{
+      currentFocus ++;
+    }
+    
+  },
+  click5: function(){
+    updateField(this, "5");
+    password = password + "5";
+    if(currentFocus == 4){
+      inputPassword(password);
+      currentFocus = 0
+    }else{
+      currentFocus ++;
+    }
+    
+  },
+  click6: function(){
+    updateField(this, "6");
+    password = password + "6";
+    if(currentFocus == 4){
+      inputPassword(password);
+      currentFocus = 0
+    }else{
+      currentFocus ++;
+    }
+    
+  },
+  click7: function(){
+    updateField(this, "7");
+    password = password + "7";
+    if(currentFocus == 4){
+      inputPassword(password);
+      currentFocus = 0
+    }else{
+      currentFocus ++;
+    }
+    
+  },
+  click8: function(){
+    updateField(this, "8");
+    password = password + "8";
+    if(currentFocus == 4){
+      inputPassword(password);
+      currentFocus = 0
+    }else{
+      currentFocus ++;
+    }
+    
+  },
+  click9: function(){
+    updateField(this, "9");
+    password = password + "9";
+    if(currentFocus == 4){
+      inputPassword(password);
+      currentFocus = 0
+    }else{
+      currentFocus ++;
+    }
+    
+  },
+  click0: function(){
+    updateField(this, "0");
+    password = password + "0";
+    if(currentFocus == 4){
+      inputPassword(password);
+      currentFocus = 0
+    }else{
+      currentFocus ++;
+    }
+    
+  },
+  clickdel: function(){
+    if(currentFocus > 1){
+      currentFocus --;
+      updateField(this, "");
+    }
+  },
+  clickdot: function(){
+
   }
 })

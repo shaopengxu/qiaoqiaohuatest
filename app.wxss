@@ -12,7 +12,7 @@ page{
 } 
 .mod-btn-line{
   width: 100%;
-  padding: 20rpx 30rpx;
+  padding: 40rpx 30rpx;
   box-sizing: border-box;
 }
 .mod-btn{
@@ -43,8 +43,6 @@ page{
     display: inline-block;
     width: 40rpx;
     height: 34rpx;
-    background: url(/res/img/global/ico_tips.png) no-repeat;
-    background-size: 100%;
     vertical-align: top;
     margin-right: 12rpx;
 }
@@ -86,24 +84,25 @@ page{
 .ico-msglist{
   width: 50rpx;
   height: 50rpx;
-  background-image: url(/res/img/global/ico_msglist.png);
 }
 
 .ico-person{
   width: 50rpx;
   height: 50rpx;
-  background-image: url(/res/img/global/ico_person.png);
 }
-.menu-item.on .ico-msglist{
+/*.menu-item.on .ico-msglist{
   background-image: url(/res/img/global/ico_msglist_on.png);
 }
-.menu-item.on .ico-person{
+.menu-item.on .ico-msglist{
   background-image: url(/res/img/global/ico_person_on.png);
-}
+}*/
 
 .arrow-right{
   width: 16rpx;
   height: 26rpx;
-  background-image: url(/res/img/global/arrow.png);
-  background-size: 100%;
+}
+.ico-warn{
+  display: inline-block;
+  width: 48rpx;
+  height: 48rpx;
 }
