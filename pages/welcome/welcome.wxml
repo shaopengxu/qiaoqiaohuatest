@@ -1,5 +1,7 @@
-<view class="container" style="background-image:url(/res/img/index/bg.png) no-repeat">
+
+<view class="container">
    <view class="bd">
+    <image class="bg" src="/res/img/index/bg.png"></image>
     <view class="desc">
         <text>这里，是你和ta最私密的聊天空间</text>
     </view>

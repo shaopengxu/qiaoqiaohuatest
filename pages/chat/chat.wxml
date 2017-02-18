@@ -44,8 +44,8 @@
     </view>
     <view class="chat-line">
         <input type="text" class="input" bindinput="changeInputContent" bindconfirm="sendMessage" value="{{inputContent}}"/>
-        <view class="ico-face"></view>
-        <view class="ico-photo"></view>
+        <image class="ico-face" src="/res/img/chat/ico_face.png"></image>
+        <image class="ico-photo" src="/res/img/chat/ico_photo.png"></image>
     </view>
 
 </view>
