@@ -51,13 +51,13 @@ function receiveMessage(message) {
     var friend = friends[friendIndex];
     if(friend) {
         // 更新未读数量
-        if(!friend.unreadSize){
-            friend.unreadSize = 0;
+        if(!friend.unreadMessageSize){
+            friend.unreadMessageSize = 0;
         }
         if(!friend.lastMessage){
             friend.lastMessage = "";
         }
-        friend.unreadSize = friend.unreadSize + 1;
+        friend.unreadMessageSize = friend.unreadMessageSize + 1;
         friend.lastMessage = message.content;
     }
     //  刷新界面，好友的排序升为第一位
