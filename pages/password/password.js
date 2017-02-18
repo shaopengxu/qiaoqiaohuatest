@@ -18,7 +18,7 @@ var urlAfterFromBackGround = "";
         if(password == app.globalData.userInfo.password){
           console.log("from password redirect to ... " + urlAfterFromBackGround);
             wx.redirectTo({
-              url: urlAfterFromBackGround
+              url: urlAfterFromBackGround + "?fromBackGround=true"
             })
             return;
         }else{

@@ -46,9 +46,10 @@ App({
     if(!this.firstTime){
       var pages = getCurrentPages();
       //如果是welcome page， 就不需要进入密码页
-      if(pages.length == 1){
+      if(pages.length <= 1){
         return ;
       }
+      
       wx.redirectTo({
         url: '/pages/password/password?backGround=true&url=/' + pages[pages.length-1].__route__,
         success: function(res){

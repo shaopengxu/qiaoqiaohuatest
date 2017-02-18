@@ -80,6 +80,33 @@ Page({
             if(app.globalData.isFirst) {
               wx.clearStorageSync();
             }
+            if(res.data.data.openId == app.globalData.friend.openId){
+              console.log("invite page, invite myself");
+              app.globalData.friend = null;
+              wx.showToast({
+                title: '不能邀请自己为好友',
+                icon: 'error',
+                duration: 1000
+              });
+              setTimeout(function (){
+                wx.redirectTo({
+                  url: '../welcome/welcome',
+                  success: function(res){
+                    // success
+                    console.log("invite page, invite myself, redirectTo welcome success");
+                  },
+                  fail: function() {
+                    // fail
+                    console.log("invite page, invite myself, redirectTo welcome failed");
+                  },
+                  complete: function() {
+                    // complete
+                  }
+                })
+              }, 1000);
+              
+              return ;
+            }
           },
           fail: function() {
             // fail
@@ -91,9 +118,9 @@ Page({
       })
     }else if(data && data.inviteFriend){
       this.setData({invite: true}) 
+    }else if(data && data.fromBackGround){
     }else{
       redirectToWelcome = true;
-      
     }
   },
   onShow: function(){
@@ -105,7 +132,11 @@ Page({
   },
   onShareAppMessage: function () {
         app.globalData.hasInvite = true;
-        
+        setTimeout(function (){
+          wx.navigateBack({
+            delta: 1
+          })
+        }, 1000);
         return {
             title: '朋友蜜语',
             desc: '加入朋友密码',

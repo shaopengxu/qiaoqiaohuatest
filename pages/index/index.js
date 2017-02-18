@@ -141,12 +141,13 @@ Page({
 
     onLoad: function (data) {
         that = this;
-        if(!app.socketOpen){
-            app.wxConnectSocket();
-        }
         if(data && data.navigateToOpenId) {
             navigateToOpenId = data.navigateToOpenId;
         }
+        if(!app.socketOpen){
+            app.wxConnectSocket();
+        }
+        
     },
 
     onShow: function() {
