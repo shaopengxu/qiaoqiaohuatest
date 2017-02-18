@@ -116,6 +116,7 @@ Page({
        if(app.globalData.isLogin){
           app.addInvitorToFriend();
        }else{
+         console.log("invite_friend page,  needAddFriend = true")
          wx.navigateTo({
            url: '../password/password?needAddFriend=true'
          })

@@ -30,7 +30,7 @@ var urlAfterFromBackGround = "";
           return ;
         }
     }
-    
+    console.log("password page isFirst  " + app.globalData.isFirst + " sessionId = " + app.globalData.sessionId + " needAddFriend " + needAddFriend)
     if(app.globalData.isFirst) {
       // 注册用户
       wx.request({
@@ -113,10 +113,15 @@ Page({
     tip:"密码输入错误超过5次，请10分钟后重新尝试"
   },
   onLoad:function(data) {
+      console.log("password page needAddFriend " + data.needAddFriend);
       if(data && data.backGround){
          console.log("back ground " + data.backGround);
          backGround = data.backGround;
          urlAfterFromBackGround = data.url;
+      }
+      if(data && data.needAddFriend){
+
+        needAddFriend = data.needAddFriend;
       }
   },
   onReady:function(){
