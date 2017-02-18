@@ -1,8 +1,29 @@
-// pages/person/person.js
+var app = getApp();
+const http_server = require("../../config.js").http_server;
+
 Page({
-  data:{},
-  onLoad:function(options){
-    // 页面初始化 options为页面跳转所带来的参数
+  data:{ 
+    friend : null
+  },
+  onLoad:function(data){
+    if(data && data.openId){
+       var friends = wx.getStorageSync('friends');
+       console.log("person page, openId = " + data.openId)
+       var friend = app.getFriendByOpenId(friends, data.openId);
+       if(!friend){
+         wx.showToast({
+            title: '不存在该好友',
+            icon: 'error',
+            duration: 1000
+          });
+          wx.navigateBack({
+            delta: 1
+          })
+          return;
+       }
+       this.setData({friend: friend});
+    }
+
   },
   onReady:function(){
     // 页面渲染完成
@@ -15,5 +36,43 @@ Page({
   },
   onUnload:function(){
     // 页面关闭
-  }
+  },
+  deleteChatMessage:function(){
+    wx.request({
+      url: http_server + '/weixin/delete_chat_message',
+      data: {friendOpenId : this.data.friend.friendOpenId, sessionId : app.globalData.sessionId},
+      method: 'GET',
+      success: function(res){
+        wx.showToast({
+          title: '清空聊天记录成功',
+          icon: 'success',
+          duration: 1000
+        })
+      },
+      fail: function() {
+        // fail
+      },
+      complete: function() {
+        // complete
+      }
+    })
+    
+  },
+  changeImage: function(){
+      wx.request({
+        url: http_server + '/weixin/change_random_image',
+        data: {},
+        method: 'GET', 
+        success: function(res){
+          //更新当前图片
+          //更新缓存的friend的信息
+        },
+        fail: function() {
+          // fail
+        },
+        complete: function() {
+          // complete
+        }
+      })
+  }  
 })

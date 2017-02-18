@@ -2,6 +2,7 @@ var app = getApp()
 const http_server = require("../../config.js").http_server;
 
 var isFirst = true;
+var redirectToWelcome = false;
 
 
 
@@ -88,16 +89,27 @@ Page({
           }
         })
       })
+    }else if(data && data.inviteFriend){
+      this.setData({invite: true}) 
     }else{
-      this.setData({invite: true})
+      redirectToWelcome = true;
       
     }
   },
+  onShow: function(){
+    if(redirectToWelcome) {
+        wx.redirectTo({
+          url: '../welcome/welcome'
+        })
+    }
+  },
   onShareAppMessage: function () {
+        app.globalData.hasInvite = true;
+        
         return {
-            title: '邀请聊天',
-            desc: '加入私密聊天',
-            path: 'pages/invite_friend/invite_friend?openId=' + app.globalData.userInfo.openId
+            title: '朋友蜜语',
+            desc: '加入朋友密码',
+            path: '/pages/invite_friend/invite_friend?openId=' + app.globalData.userInfo.openId
         }
    },
    acceptInvite: function() {

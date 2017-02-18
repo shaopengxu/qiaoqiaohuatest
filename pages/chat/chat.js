@@ -29,7 +29,8 @@ function receiveMessage(message){
         // 已经接受到该消息
         //console.log("chat message has received")
         if(isThisChat) {
-            that.setData({messages: messages, lastMessageId : message.messageId});
+            that.setData({messages: messages});
+            that.setData({lastMessageId : message.messageId});
         }
         return; 
     }
@@ -38,7 +39,8 @@ function receiveMessage(message){
     wx.setStorageSync('messages_' + friendOpenId, messages);
     //console.log("isThisChat " + isThisChat + ", isMe " + message.isMe);
     if(isThisChat){
-        that.setData({messages: messages, lastMessageId : message.messageId});
+        that.setData({messages: messages});
+        that.setData({lastMessageId : message.messageId});
     }
     
 }
@@ -118,7 +120,14 @@ Page({
 		// 显示聊天信息
         // 聊天记录向上拉，显示从本地存储读出的数据，如果已经读完了，从服务器拉数据
         var messages = wx.getStorageSync('messages_' + friendUserInfo.openId) || [];
-        that.setData({messages: messages, friendUserInfo: friendUserInfo, meUserInfo: meUserInfo});
+        that.setData({
+            messages: messages, 
+            friendUserInfo: friendUserInfo,
+            meUserInfo: meUserInfo 
+        });
+        that.setData({
+            lastMessageId: (messages && messages.length > 0) ? messages[messages.length - 1].messageId : "" 
+        });
         var lastMessageId = messages.length == 0 ? -1 : messages[messages.length - 1].messageId;
         wx.request({
           url: http_server + '/weixin/ask_for_msg_push',
@@ -169,11 +178,17 @@ Page({
         this.setData({ inputContent: e.detail.value });
     },
 
+    navigateToPerson (e){
+        wx.navigateTo({
+          url: '../person/person?openId=' + friendUserInfo.openId
+        })
+    },
+
     /**
      * 点击「发送」按钮，通过信道推送消息到服务器
      **/
     sendMessage(e) {
-        console.log("message content: " + e.detail.value);
+        console.log("message content: " + this.data.inputContent);
         var message = {};
         message.data = {};
         message.data.fromOpenId = meUserInfo.openId;
@@ -193,7 +208,7 @@ Page({
           },
           complete: function() {
             // complete
-            //that.setData({ inputContent: ''});
+            that.setData({ inputContent: ''});
           }
         })
         return {value : '' , cursor : 0};

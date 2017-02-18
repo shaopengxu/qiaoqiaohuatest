@@ -4,6 +4,7 @@ const websocket_server = require("../../config.js").ws_server;
 
 var that = null;
 var socketOpen = false;
+var navigateToOpenId = null;
 
 /**
  * 收到批量消息
@@ -67,6 +68,7 @@ function receiveMessage(message) {
     wx.setStorageSync('friends', friends);
     if(that){
         that.setData({friends: friends});
+        
     }
 }
 
@@ -87,6 +89,8 @@ function addFriend(friend){
     
     if(that){
         that.setData({friends: friends});
+        app.globalData.hasInvite = false;
+        that.setData({hasInvite: app.globalData.hasInvite});
     }
 }
 
@@ -106,6 +110,13 @@ function getFriendList() {
                 that.setData({'friends': res.data.data});
                 frs = res.data.data;
                 wx.setStorageSync('friends', frs);
+
+                // 通过邀请好友进来，直接进入聊天界面
+                if(navigateToOpenId){
+                    var friend = app.getFriendByOpenId(friends, navigateToOpenId);
+                    wx.navigateTo({ url: '../chat/chat?openId=' + friend.friendOpenId
+                        + "&nickName=" + friend.friendNickName + "&image=" + friend.friendImage});
+                }
             },
             fail: function() {
                 app.failHandle();
@@ -124,26 +135,21 @@ function getFriendList() {
 Page({
 
     data: {
-        friends:[]
+        friends:[],
+        hasInvite: false
     },
 
-    onLoad: function (params) {
+    onLoad: function (data) {
         that = this;
         if(!app.socketOpen){
             app.wxConnectSocket();
         }
-        
-        
-
-        wx.onSocketError(function() {
-            // 重连websocket
-            console.log("websocket error, reconnect");
-            //wxConnectSocket();
-        })
+        if(data && data.navigateToOpenId) {
+            navigateToOpenId = data.navigateToOpenId;
+        }
     },
 
     onShow: function() {
-        console.log("index page onShow");
         //加载好友
         getFriendList();
         // 监听websocket的消息
@@ -162,6 +168,8 @@ Page({
                 receiveMessages(data.data || []);
            }
         })
+        // 更新发出邀请消息
+        this.setData({hasInvite: app.globalData.hasInvite});
     },
     
     onUnload: function () {
@@ -171,27 +179,19 @@ Page({
         console.log("income talking to friend " + friend)
         var friendOpenId = event.currentTarget.id;
         var friends = wx.getStorageSync('friends');
-        if(!friends){
-            return;
-        }
-        var friendIndex = app.getFriendIndexFromList(friends, friendOpenId);
-        console.log("friendOpenId " + friendOpenId + ", friendIndex " + friendIndex);
-        if(friendIndex < 0) {
-            return ;
-        }
-        var friend = friends[friendIndex];
+        var friend = app.getFriendByOpenId(friends, friendOpenId);
         console.log("talking to friend " + friend)
         wx.navigateTo({ url: '../chat/chat?openId=' + friendOpenId
-            + "&nickName=" + friend.friendNickName + "&image=" + friend.image});
+            + "&nickName=" + friend.friendNickName + "&image=" + friend.friendImage});
         
     },
 
     navigateToMe: function(){
-        wx.navigateTo({url: '../me/me'});
+        wx.redirectTo({url: '../me/me'});
     },
 
     redirectToAddFriend: function(event) {
-        wx.navigateTo({url: '../invite_friend/invite_friend'});
+        wx.navigateTo({url: '../invite_friend/invite_friend?inviteFriend=true'});
     }
 
  

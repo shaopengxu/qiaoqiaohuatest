@@ -4,14 +4,16 @@
         <scroll-view scroll-y="true" style="height: 400px">
             <view class="info">
                 <view class="info-avatar">
-                    <image src="/res/img/avatar1.png"></image>
+                    <image src="{{userInfo.avatarUrl}}"></image>
                 </view>
                 <view class="info-msgcnt">
                     <view>
-                        <text class="title">大雄</text>
+                        <text class="title">{{userInfo.nickName}}</text>
                         <view class="ico-male"></view> <!--男性是ico-male， 女性是ico-female-->
                     </view>
+                    <!--
                     <text class="text">微信号：Nobita Nobi</text>
+                    -->
                 </view>
             </view>
             <view class="links">
@@ -30,7 +32,7 @@
                     <view class="arrow-right"></view>
                 </view>
             </view>
-            <button class="new-btn-white">安全退出</button>
+            <button class="new-btn-white" bindtap="quit">安全退出</button>
         </scroll-view>
     </view>
     <view class="menu">

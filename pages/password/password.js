@@ -4,11 +4,32 @@ const http_server = require("../../config.js").http_server;
 var password1 = ""
 var password2 = ""
 var needAddFriend = false;
+var backGround = false;
+var urlAfterFromBackGround = "";
+
 
   /**
    * 输入密码
    */
   function inputPassword(password) {
+
+    if(backGround && urlAfterFromBackGround){
+        backGround = false;
+        if(password == app.globalData.userInfo.password){
+          console.log("from password redirect to ... " + urlAfterFromBackGround);
+            wx.redirectTo({
+              url: urlAfterFromBackGround
+            })
+            return;
+        }else{
+          wx.showToast({
+            title: '密码错误',
+            icon: 'error',
+            duration: 10000
+          })
+          return ;
+        }
+    }
     
     if(app.globalData.isFirst) {
       // 注册用户
@@ -92,18 +113,17 @@ Page({
     tip:"密码输入错误超过5次，请10分钟后重新尝试"
   },
   onLoad:function(data) {
-      if(app.globalData.isFirst){
-          this.setData({tip: '请设置登录密码'});
-      }
-      if(data && data.needAddFriend){
-          needAddFriend = true;
+      if(data && data.backGround){
+         console.log("back ground " + data.backGround);
+         backGround = data.backGround;
+         urlAfterFromBackGround = data.url;
       }
   },
   onReady:function(){
     // 页面渲染完成
   },
   onShow:function(){
-    // 页面显示
+    
   },
   onHide:function(){
     // 页面隐藏
@@ -112,8 +132,8 @@ Page({
     // 页面关闭
   },
   input1Change: function(e){
-    this.setData({focus1: false, focus2: true, focus3: false, focus4: false, input1: e.detail.value})
-  
+    //this.setData({focus1: false, focus2: true, focus3: false, focus4: false, input1: e.detail.value})
+    inputPassword(e.detail.value +  "234");
   },
   input2Change: function(e){
     this.setData({focus1: false, focus2: false, focus3: true, focus4: false, input2: e.detail.value})

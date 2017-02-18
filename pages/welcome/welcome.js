@@ -19,6 +19,10 @@ Page({
 
   onLoad: function () {
     var that = this
+    var ii = 0;
+    setInterval(function(){
+      //console.log("running...." + ii++);
+    }, 1000000);
     //调用应用实例的方法获取全局数据
     app.getUserInfo(function(userInfo){
       //请求服务器 该用户是否已经登陆过

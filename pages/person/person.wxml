@@ -3,22 +3,24 @@
     <!--垂直滚动，这里必须设置高度-->
         <scroll-view scroll-y="true" style="height: 400px">
             <view class="info">
-                <view class="info-avatar">
-                    <image src="/res/img/avatar1.png"></image>
+                <view class="info-avatar" bindtap="changeImage">
+                    <image src="{{friend.friendImage}}"></image>
                 </view>
                 <view class="info-msgcnt">
                     <view>
-                        <text class="title">大雄</text>
+                        <text class="title">{{friend.friendNickName}}</text>
                         <view class="ico-male"></view> <!--男性是ico-male， 女性是ico-female-->
                     </view>
+                    <!--
                     <text class="text">微信号：Nobita Nobi</text>
+                    -->
                 </view>
             </view>
             <view class="links">
                 <view class="link">
                     <view class="ico-lock"></view>
                     <view class="link-msgcnt">
-                        <text class="title">清空聊天记录</text>
+                        <text class="title" bindtap="deleteChatMessage">清空聊天记录</text>
                     </view>
                     <view class="arrow-right"></view>
                 </view>

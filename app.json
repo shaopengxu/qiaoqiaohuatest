@@ -4,11 +4,11 @@
     "pages/welcome/welcome",
     "pages/password/password",
     "pages/index/index",
-    "pages/person/person",
     "pages/me/me",
     "pages/chat/chat",
-    "pages/logs/logs",
-    "pages/invite_friend/invite_friend"
+    "pages/invite_friend/invite_friend",
+    "pages/person/person"
+    
   ],
   "window":{
     "backgroundTextStyle":"light",

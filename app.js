@@ -1,6 +1,6 @@
 //app.js
 App({
-
+  firstTime: false,
   getUserInfo:function(cb){
     var that = this
     if(this.globalData.userInfo){
@@ -25,11 +25,50 @@ App({
     }
   },
 
+  getFriendByOpenId: function(friends, openId) {
+    if((!friends) || (!openId)){
+      return null;
+    }
+
+    for(var index = 0; index< friends.length;index++) {
+       if(friends[index].friendOpenId == openId) {
+          return friends[index];
+       }
+    }
+    return null;
+  },
+
   onLaunch: function () {
-    //调用API从本地缓存中获取数据
-    var logs = wx.getStorageSync('logs') || []
-    logs.unshift(Date.now())
-    wx.setStorageSync('logs', logs)
+    this.firstTime = true;
+  },
+
+  onShow(){
+    if(!this.firstTime){
+      var pages = getCurrentPages();
+      //如果是welcome page， 就不需要进入密码页
+      if(pages.length == 1){
+        return ;
+      }
+      wx.redirectTo({
+        url: '/pages/password/password?backGround=true&url=/' + pages[pages.length-1].__route__,
+        success: function(res){
+          // success
+          console.log("app onshow navigate to password success ")
+        },
+        fail: function() {
+          console.log("app onshow navigate to password fail ")
+        },
+        complete: function() {
+          // complete
+        }
+      })
+    }
+    this.firstTime =false;
+
+  },
+
+  onHide(){
+
   },
 
   containsMessage: function(messages, message){
@@ -108,6 +147,7 @@ addInvitorToFriend: function(callbackFunc){
           wx.sendSocketMessage({
           data: JSON.stringify(message),
           success: function(res) {
+
           },
           fail: function() {
               // fail
@@ -133,6 +173,11 @@ addInvitorToFriend: function(callbackFunc){
         success: function(res){
             that.socketOpen = true;
             that.websocketOpen();
+            wx.onSocketError(function() {
+                // 重连websocket
+                console.log("websocket error, reconnect");
+                //wxConnectSocket();
+            })
         },
         fail: function() {
           that.failHandle();
@@ -154,7 +199,8 @@ addInvitorToFriend: function(callbackFunc){
     code: null,
     friend: null,
     res: null,
-    socketOpen : false
+    socketOpen : false,
+    hasInivte : false
   },
   client:null
 })

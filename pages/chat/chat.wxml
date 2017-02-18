@@ -1,47 +1,49 @@
 <view class="container">
     <view class="scrollview">
-        <scroll-view scroll-y scroll-into-view="message-{{lastMessageId}}" scroll-y="true" style="height: 500px">
+        <scroll-view scroll-y="true" style="height: 500px" scroll-into-view="message_{{lastMessageId}}">
             <view class="date">
                 <text>2017年1月18日 15:27</text>
             </view>
-            <view wx:for="{{messages}}" wx:for-item="message" wx:key="id" id="message-{{message.messageId}}" class="{{message.isMe ? 'me' : 'friend'}}">
-                <block wx:if="{{message.isMe}}" >
-                    <view class="me">
-                        <view class="wrap">
-                            <view class="words">
-                                <view class="words-arr">
-                                    <view class="words-arr-inn"> </view>
+            <block wx:for="{{messages}}" wx:for-item="message" wx:key="id" >
+                <view id="message_{{message.messageId}}" class="{{message.isMe ? 'me' : 'friend'}}">
+                    <block wx:if="{{message.isMe}}" >
+                        <view class="me">
+                            <view class="wrap">
+                                <view class="words">
+                                    <view class="words-arr">
+                                        <view class="words-arr-inn"> </view>
+                                    </view>
+                                    <text>{{message.content}}</text>
+                                    <view class="words-lock"></view>
                                 </view>
-                                <text>{{message.content}}</text>
-                                <view class="words-lock"></view>
+                            </view>
+                            <view class="avatar">
+                                <image src="{{meUserInfo.avatarUrl}}"></image>
                             </view>
                         </view>
-                        <view class="avatar">
-                            <image src="/res/img/avatar1.png"></image>
-                        </view>
-                    </view>
-                </block> 
-                <block wx:else>
-                    <view class="friend">
-                        <view class="avatar">
-                            <image src="/res/img/avatar1.png"></image>
-                        </view>
-                        <view class="wrap">
-                            <view class="words">
-                                <view class="words-arr">
-                                    <view class="words-arr-inn"> </view>
+                    </block> 
+                    <block wx:else>
+                        <view class="friend">
+                            <view class="avatar">
+                                <image src="{{friendUserInfo.image}}" bindtap="navigateToPerson"></image>
+                            </view>
+                            <view class="wrap">
+                                <view class="words">
+                                    <view class="words-arr">
+                                        <view class="words-arr-inn"> </view>
+                                    </view>
+                                    <text>{{message.content}}</text>
+                                    <view class="words-lock-gray"></view>
                                 </view>
-                                <text>{{message.content}}</text>
-                                <view class="words-lock-gray"></view>
                             </view>
                         </view>
-                    </view>
-                </block>
-            </view>
+                    </block>
+                </view>
+            </block>
         </scroll-view>
     </view>
     <view class="chat-line">
-        <input type="text" class="input" bindchange="changeInputContent" bindconfirm="sendMessage"/>
+        <input type="text" class="input" bindinput="changeInputContent" bindconfirm="sendMessage" value="{{inputContent}}"/>
         <view class="ico-face"></view>
         <view class="ico-photo"></view>
     </view>

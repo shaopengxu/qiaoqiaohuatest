@@ -1,8 +1,10 @@
-// pages/person/person.js
+var app = getApp();
 Page({
-  data:{},
+  data:{
+    userInfo : null
+  },
   onLoad:function(options){
-    // 页面初始化 options为页面跳转所带来的参数
+    this.setData({userInfo: app.globalData.userInfo})
 
     
   },
@@ -20,5 +22,10 @@ Page({
   },
   navegateBackToIndex: function(){
     wx.redirectTo({url: '../index/index'});
+  },
+  quit: function(){
+    wx.navigateBack({
+      delta: 100
+    })
   }
 })
