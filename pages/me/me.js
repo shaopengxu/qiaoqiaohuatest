@@ -5,8 +5,6 @@ Page({
   },
   onLoad:function(options){
     this.setData({userInfo: app.globalData.userInfo})
-
-    
   },
   onReady:function(){
     // 页面渲染完成

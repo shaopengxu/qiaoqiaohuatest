@@ -3,7 +3,8 @@ const http_server = require("../../config.js").http_server;
 
 Page({
   data:{ 
-    friend : null
+    friend : null,
+    nickName : ""
   },
   onLoad:function(data){
     if(data && data.openId){
@@ -37,6 +38,8 @@ Page({
   onUnload:function(){
     // 页面关闭
   },
+
+  //清空聊天记录
   deleteChatMessage:function(){
     wx.request({
       url: http_server + '/weixin/delete_chat_message',
@@ -61,7 +64,7 @@ Page({
   changeImage: function(){
       wx.request({
         url: http_server + '/weixin/change_random_image',
-        data: {},
+        data: {friendOpenId : this.data.friend.friendOpenId, sessionId : app.globalData.sessionId},
         method: 'GET', 
         success: function(res){
           //更新当前图片
@@ -74,5 +77,21 @@ Page({
           // complete
         }
       })
-  }  
+  },
+  updateNickName: function(){
+    wx.request({
+      url: http_server + '/weixin/update_friend_nick_name',
+      data: {friendOpenId : this.data.friend.friendOpenId, nickName: this.data.nickName, sessionId : app.globalData.sessionId},
+      method: 'GET', 
+      success: function(res){
+        // success
+      },
+      fail: function() {
+        // fail
+      },
+      complete: function() {
+        // complete
+      }
+    })
+  }
 })
