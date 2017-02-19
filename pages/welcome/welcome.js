@@ -108,8 +108,8 @@ Page({
   },
 
   startme:function(){
-    this.setData({showPassword: "", focus: true})
-    /*
+    //this.setData({showPassword: "", focus: true})
+    
     if(!app.globalData.userAuth){
         wx.showToast({
           title: '用户授权失败',
@@ -125,7 +125,7 @@ Page({
         url: '../password/password'
       })
     }
-   */
+   
   },
   closePassword: function(){
     password1 = '';
@@ -170,6 +170,11 @@ Page({
             app.globalData.sessionId = res.data.data.sessionId;
             if(app.globalData.isFirst) {
               wx.clearStorageSync();
+            }else{
+              wx.redirectTo({
+                url: '../password/password'
+              })
+              return ;
             }
           }else{
             wx.showToast({
