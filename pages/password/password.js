@@ -87,9 +87,9 @@ var currentFocus = 1;
   }
 
   function loginSuccess() {
-    
+     
       wx.redirectTo({
-        url: '../index/index',
+        url: '../index/index' + (needAddFriend? ('?navigateToOpenId=' + app.globalData.friend.openId): ''),
         success: function(res){
           
         },

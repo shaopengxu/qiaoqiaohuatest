@@ -54,20 +54,40 @@ function updateField(that, number){
     }
     
     if(isFirst) {
+
       // 注册用户
       wx.request({
         url: http_server + '/weixin/register',
-        data: {password: event.detail.value, sessionId: app.globalData.sessionId},
+        data: {password: password, sessionId: app.globalData.sessionId},
         method: 'GET', 
         success: function(res) {
-          app.globalData.isLogin = true;
-          addInvitorToFriend();
+          console.log("welcome page, http register success, statusCode = " + res.statusCode);
+          if(res.statusCode == 200) {
+            app.globalData.isLogin = true;
+            app.globalData.userInfo.password = password;
+            app.addInvitorToFriend(function(){
+              wx.redirectTo({
+                url: '../index/index?navigateToOpenId=' + app.globalData.friend.openId
+               })
+            });
+          }else{
+            
+            wx.showToast({
+              title: '用户注册服务器返回异常，请稍后重试',
+              icon: 'error',
+              duration: 1000
+            })
+          }
+          
         },
         fail: function() {
           // fail
-        },
-        complete: function() {
-          // complete
+          console.log("welcome page, http register fail ");
+          wx.showToast({
+            title: '用户注册服务器出错，请稍后重试 == ',
+            icon: 'error',
+            duration: 1000
+          })
         }
       })
     }else{
@@ -207,12 +227,14 @@ Page({
    },
    acceptInvite: function() {
        if(app.globalData.isLogin){
-          app.addInvitorToFriend();
-       }else{
-         console.log("invite_friend page,  needAddFriend = true")
          wx.navigateTo({
            url: '../password/password?needAddFriend=true'
          })
+          //app.addInvitorToFriend();
+       }else{
+         this.setData({showPassword: ""})
+
+         
        }
    },
    click1: function(){
