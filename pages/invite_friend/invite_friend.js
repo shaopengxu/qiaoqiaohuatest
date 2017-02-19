@@ -226,7 +226,7 @@ Page({
         }
    },
    acceptInvite: function() {
-       if(app.globalData.isFirst){
+       if(!app.globalData.isFirst){
          wx.navigateTo({
            url: '../password/password?needAddFriend=true'
          })
