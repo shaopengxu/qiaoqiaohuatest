@@ -11,17 +11,23 @@
     <view class="mod-pop" style="{{showPassword}}">
         <view class="pop-main">
             <text class="pop-title">{{popTitle}}</text>
-            <text class="pop-error" style="{{popError}}">两次输入密码不一致，请重新输入</text><!--显示错误加去掉class "hidden"-->
+            <text class="pop-error" style="color:rgba(230, 67, 64, {{popErrorShow}})">两次输入密码不一致，请重新输入</text><!--显示错误加去掉class "hidden"-->
             
-            <view class="inputbox">
+            <view class="inputbox" bindtap="makeFocus">
                 <view class="input"><text>{{input1}}</text></view>
                 <view class="input"><text>{{input2}}</text></view>
                 <view class="input"><text>{{input3}}</text></view>
                 <view class="input"><text>{{input4}}</text></view>
             </view>
             <view class="pop-close" bindtap="closePassword"><image src="/res/img/password/pop_close.png"></image></view>
+            <block wx:if="{{focus}}">
+                <input type = "number" focus="true" style="display: none" bindinput="inputNumber"/>
+            </block>
         </view>
+        
     </view>
+    
+    <!--
     <view class="keyboard" style="{{showPassword}}">
         <image class="keyboard-img" src="/res/img/password/keyboard.png"></image>
         <view class="keyboard-ico keyboard-img1" bindtap="click1"></view>
@@ -37,6 +43,7 @@
         <view class="keyboard-ico keyboard-img0" bindtap="click0"></view>
         <view class="keyboard-ico keyboard-imgdel" bindtap="clickdel"></view>
     </view>
+    -->
    </view>
    
    

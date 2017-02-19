@@ -51,38 +51,37 @@ App({
   },
 
   onLaunch: function () {
-    this.globalData.firstTime = true;
   },
 
   onShow(){
-    if(!this.globalData.firstTime){
-      // 从后台返回
-      var pages = getCurrentPages();
-      //如果是welcome page，或者密码页， 就不需要进入密码页
-      if(pages.length <= 1 || pages[pages.length-1].__route__.indexOf("password") >= 0){
-        return ;
-      }
-      
-      wx.redirectTo({
-        url: '/pages/password/password?backGround=true&url=/' + pages[pages.length-1].__route__,
-        success: function(res){
-          // success
-          console.log("app onshow navigate to password success ")
-        },
-        fail: function() {
-          console.log("app onshow navigate to password fail ")
-        },
-        complete: function() {
-          // complete
-        }
-      })
-    }
-    this.globalData.firstTime =false;
+    
 
   },
 
   onHide(){
-
+    
+    // 从后台返回
+    var pages = getCurrentPages();
+    //如果是welcome page，或者密码页， 就不需要进入密码页
+    if(pages.length <= 1 || pages[pages.length-1].__route__.indexOf("password") >= 0){
+      return ;
+    }
+    
+    wx.redirectTo({
+      url: '/pages/password/password?backGround=true&url=/' + pages[pages.length-1].__route__,
+      success: function(res){
+        // success
+        console.log("app onHide navigate to password success ")
+      },
+      fail: function() {
+        console.log("app onHide navigate to password fail ")
+      },
+      complete: function() {
+        // complete
+      }
+    })
+     
+  
   },
 
   containsMessage: function(messages, message){
@@ -154,7 +153,7 @@ addInvitorToFriend: function(callbackFunc) {
     });
   },
 
-  websocketOpen: function(){
+  websocketOpen: function(callback){
     var that =this;
     wx.onSocketOpen(function() {
           console.log("websocket open");
@@ -163,15 +162,30 @@ addInvitorToFriend: function(callbackFunc) {
               console.log("websocket error, reconnect");
               //wxConnectSocket();
           })
+          wx.onSocketClose(function() {
+            console.log("websocket closed");
+          })
+          
+          setInterval(function (){
+
+            wx.sendSocketMessage({
+              data: '{}'
+            })
+          }, 50000);
+          
           //websocket登录
           var message = {};
           message.type = "1";
           message.openId = that.globalData.userInfo.openId;
           message.password = that.globalData.userInfo.password;
+
           wx.sendSocketMessage({
           data: JSON.stringify(message),
           success: function(res) {
               console.log("websocket login success!");
+              if(callback){
+                callback();
+              }
           },
           fail: function() {
               // fail
@@ -184,7 +198,7 @@ addInvitorToFriend: function(callbackFunc) {
       })
   },
 
-  wxConnectSocket: function() {
+  wxConnectSocket: function(callback) {
     var that = this;
     var websocket_server = require("config.js").ws_server;
       //连接websocket
@@ -198,7 +212,7 @@ addInvitorToFriend: function(callbackFunc) {
         method: 'GET', 
         success: function(res){
             that.socketOpen = true;
-            that.websocketOpen();
+            that.websocketOpen(callback);
             
         },
         fail: function() {
@@ -212,6 +226,7 @@ addInvitorToFriend: function(callbackFunc) {
    },
   
   globalData:{
+    currentChatFriendUserInfo: null, // 当前聊天对象 
     isFirst: true, // 是否注册过
     userInfo: null,
     sessionId: null,
@@ -224,7 +239,7 @@ addInvitorToFriend: function(callbackFunc) {
     socketOpen : false,
     hasInivte : false,
     userAuth: true, // 用户授权
-    firstTime: false,  // 判断是否从后台返回
+    
   },
   client:null
 })

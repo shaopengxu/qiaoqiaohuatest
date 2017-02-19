@@ -29,8 +29,8 @@ function inputPassword(that) {
   }else{
     // 第二遍输入
     if(password != password1){
-      //wx.showToast({title:"密码不一致", icon:"warn", duration:1000})
-      that.setData({popError: ""})
+      
+      that.setData({popErrorShow: 1})
       currentFocus = 5;
       return ; 
     }
@@ -80,13 +80,13 @@ function inputPassword(that) {
 
 function updateField(that, number){
     if(currentFocus == 1){
-      that.setData({"input1": number, popError: "display:none"});
+      that.setData({"input1": number, popError: " "});
     }else if(currentFocus == 2){
-      that.setData({"input2": number, popError: "display:none"});
+      that.setData({"input2": number, popError: " "});
     }else if(currentFocus == 3){
-      that.setData({"input3": number, popError: "display:none"});
+      that.setData({"input3": number, popError: " "});
     }else if(currentFocus == 4){
-      that.setData({"input4": number, popError: "display:none"});
+      that.setData({"input4": number, popError: " "});
     }
   }
 
@@ -98,10 +98,18 @@ Page({
     input4: '',
     showPassword: "display: none",
     popTitle: '请设置登录密码',
-    popError: 'display:none'
+    popErrorShow: 0,
+    focus : false
+  },
+
+  makeFocus: function(){
+    this.setData({focus:false});
+    this.setData({focus:true});
   },
 
   startme:function(){
+    this.setData({showPassword: "", focus: true})
+    /*
     if(!app.globalData.userAuth){
         wx.showToast({
           title: '用户授权失败',
@@ -111,16 +119,15 @@ Page({
         return;
     }
     if(app.globalData.isFirst){
-      this.setData({showPassword: ""})
+      this.setData({showPassword: "", focus: true})
     }else{
       wx.navigateTo({
         url: '../password/password'
       })
     }
-   
+   */
   },
   closePassword: function(){
-    this.setData({showPassword: "display: none"})
     password1 = '';
     password = "";
     currentFocus = 1;
@@ -131,7 +138,8 @@ Page({
       input3: '',
       input4: '',
       popTitle: '请设置密码',
-      popError: 'display:none'
+      popErrorShow: '0',
+      focus: false
     })
   },
   onLoad: function () {
@@ -198,128 +206,54 @@ Page({
       input2: '',
       input3: '',
       input4: '',
-      popTitle: '请设置密码'
+      popTitle: '请设置密码',
+      popErrorShow: '0',
+      focus: false
     })
   },
 
-  click1: function(){
-    updateField(this, "1");
-    password = password + "1";
-    if(currentFocus == 4){
-      inputPassword(this);
-    }else{
-      currentFocus ++;
+  inputNumber: function(e){
+    password = e.detail.value.length > 4 ? e.detail.value.substring(0, 4): e.detail.value;
+    if(password.length == 1 ){
+      this.setData({
+        input1: password[0],
+        input2: '',
+        input3: '',
+        input4: ''
+      })
+    }else if(password.length == 2){
+      this.setData({
+        input1: password[0],
+        input2: password[1],
+        input3: '',
+        input4: ''
+      })
+    }else if(password.length == 3){
+      this.setData({
+        input1: password[0],
+        input2: password[1],
+        input3: password[2],
+        input4: ''
+      })
+    }else if(password.length == 4){
+      this.setData({
+        input1: password[0],
+        input2: password[1],
+        input3: password[2],
+        input4: password[3]
+      })
+    }else if(password.length == 0){
+      this.setData({
+        input1: '',
+        input2: '',
+        input3: '',
+        input4: ''
+      })
     }
-    
-  },
-  click2: function(){
-    updateField(this, "2");
-    password = password + "2";
-    if(currentFocus == 4){
-      inputPassword(this);
-      
-    }else{
-      currentFocus ++;
+    return {
+      value: password
     }
-    
-  },
-  click3: function(){
-    updateField(this, "3");
-    password = password + "3";
-    if(currentFocus == 4){
-      inputPassword(this);
-     
-    }else{
-      currentFocus ++;
-    }
-    
-  },
-  click4: function(){
-    updateField(this, "4");
-    password = password + "4";
-    if(currentFocus == 4){
-      inputPassword(this);
-      
-    }else{
-      currentFocus ++;
-    }
-    
-  },
-  click5: function(){
-    updateField(this, "5");
-    password = password + "5";
-    if(currentFocus == 4){
-      inputPassword(this);
-      
-    }else{
-      currentFocus ++;
-    }
-    
-  },
-  click6: function(){
-    updateField(this, "6");
-    password = password + "6";
-    if(currentFocus == 4){
-      inputPassword(this);
-     
-    }else{
-      currentFocus ++;
-    }
-    
-  },
-  click7: function(){
-    updateField(this, "7");
-    password = password + "7";
-    if(currentFocus == 4){
-      inputPassword(this);
-     
-    }else{
-      currentFocus ++;
-    }
-    
-  },
-  click8: function(){
-    updateField(this, "8");
-    password = password + "8";
-    if(currentFocus == 4){
-      inputPassword(this);
-      
-    }else{
-      currentFocus ++;
-    }
-    
-  },
-  click9: function(){
-    updateField(this, "9");
-    password = password + "9";
-    if(currentFocus == 4){
-      inputPassword(this);
-  
-    }else{
-      currentFocus ++;
-    }
-    
-  },
-  click0: function(){
-    updateField(this, "0");
-    password = password + "0";
-    if(currentFocus == 4){
-      inputPassword(this);
-     
-    }else{
-      currentFocus ++;
-    }
-    
-  },
-  clickdel: function(){
-    if(currentFocus > 1){
-      currentFocus --;
-      updateField(this, "");
-      password = password.substr(0, password.length -1 );
-      console.log("password page , click del password = " + password)
-    }
-  },
-  clickdot: function(){
-
   }
+
+  
 })

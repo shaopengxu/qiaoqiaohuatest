@@ -11,19 +11,19 @@ function receiveMessages(messages){
     for(var index= 0;index<messages.length;index++) {
         receiveMessage(messages[index]);
     }
-}
+ }
 
 /**
  * 收到单条消息
  */
 function receiveMessage(message){
-    //console.log(" chat receive message id " + message.messageId);
+    console.log(" chat page,  receive message id " + message.messageId);
     message.isMe = message.fromOpenId == app.globalData.userInfo.openId;
     var friendOpenId = message.isMe? message.toOpenId : message.fromOpenId;
     var messages = wx.getStorageSync("messages_" + friendOpenId) || [];
 
-    var isThisChat = message.isMe? (message.toOpenId == friendUserInfo.openId)
-           : (message.fromOpenId == friendUserInfo.openId);
+    var isThisChat = message.isMe? (message.toOpenId == app.globalData.currentChatFriendUserInfo.openId)
+           : (message.fromOpenId == app.globalData.currentChatFriendUserInfo.openId);
 
     if(app.containsMessage(messages, message)){
         // 已经接受到该消息
@@ -37,7 +37,7 @@ function receiveMessage(message){
 
     messages.push(message);
     wx.setStorageSync('messages_' + friendOpenId, messages);
-    //console.log("isThisChat " + isThisChat + ", isMe " + message.isMe);
+    console.log("chat page receive message, isThisChat " + isThisChat + ", isMe " + message.isMe);
     if(isThisChat){
         that.setData({messages: messages});
         that.setData({lastMessageId : message.messageId});
@@ -52,7 +52,7 @@ function sendMessageRead() {
 
     wx.request({
       url: http_server + '/weixin/message_read',
-      data: {friendOpenId: friendUserInfo.openId, sessionId: app.globalData.sessionId},
+      data: {friendOpenId: app.globalData.currentChatFriendUserInfo.openId, sessionId: app.globalData.sessionId},
       method: 'GET',
       success: function(res){
         // success
@@ -82,6 +82,40 @@ function addFriend(friend) {
     wx.setStorageSync('friends', friends);
 }
 
+function onWebSocketOpen(){
+    // 监听websocket的消息
+    wx.onSocketMessage(function(res) {
+        
+        //判断消息类型， 增加好友/批量推送未读消息/推送单条未读消息
+        console.log("chat page , websocket get message, res.data =  " + res.data);
+        try{
+            var data = JSON.parse(res.data);
+            if(data.code != 10000){
+                console.log("chat page, websocket get message, error code , code = " + data.code);
+                return;
+            }
+            if(data.type == '2001'){
+                    // 增加好友
+                    addFriend(data.data);
+            } else if(data.type == '1001'){
+                    // 未读消息
+                    console.log("receive message ! " + data.data);
+                    receiveMessage(data.data);
+                    sendMessageRead();
+            } else if(data.type == '1002'){
+                // 批量未读消息
+                receiveMessages(data.data);
+                sendMessageRead();
+            }else{
+                console.log("chat page, websocket 返回不正常type， type = " + data.type);
+            }
+        }catch(e){
+            console.log("chat page, get websocket message, exception, e " + e);
+        }
+        
+    })
+}
+
 // 声明聊天页面
 Page({
 
@@ -102,14 +136,17 @@ Page({
      */
     onReady() {
         wx.setNavigationBarTitle({
-          title: friendUserInfo.nickName
+          title: app.globalData.currentChatFriendUserInfo.nickName
         })
     },
 
     onLoad(data) {
-        friendUserInfo = data;
-		meUserInfo = app.globalData.userInfo;
-		that = this;
+        that = this;
+        if(data && data.openId){
+            app.globalData.currentChatFriendUserInfo = data;
+            meUserInfo = app.globalData.userInfo;
+        }
+        
         
     },
 
@@ -117,55 +154,51 @@ Page({
      * 后续后台切换回前台的时候，也要重新启动聊天
      */
     onShow() {
+        //this.setData({messages : []})
 		// 显示聊天信息
         // 聊天记录向上拉，显示从本地存储读出的数据，如果已经读完了，从服务器拉数据
-        var messages = wx.getStorageSync('messages_' + friendUserInfo.openId) || [];
-        that.setData({
+        var messages = wx.getStorageSync('messages_' + app.globalData.currentChatFriendUserInfo.openId) || [];
+        this.setData({
             messages: messages, 
-            friendUserInfo: friendUserInfo,
+            friendUserInfo: app.globalData.currentChatFriendUserInfo,
             meUserInfo: meUserInfo 
         });
-        that.setData({
+        this.setData({
             lastMessageId: (messages && messages.length > 0) ? messages[messages.length - 1].messageId : "" 
         });
         var lastMessageId = messages.length == 0 ? -1 : messages[messages.length - 1].messageId;
         wx.request({
           url: http_server + '/weixin/ask_for_msg_push',
-          data: {lastMessageId: lastMessageId, friendOpenId: friendUserInfo.openId, sessionId: app.globalData.sessionId},
+          data: {lastMessageId: lastMessageId, friendOpenId: app.globalData.currentChatFriendUserInfo.openId, sessionId: app.globalData.sessionId},
           method: 'GET'
         })
+
+        //检查websocket是否连接
+        try{
+            console.log("chat page, onShow check websocket , before")
+            wx.sendSocketMessage({
+                data: '{}',
+                success: function(res){
+                    // success
+                },
+                fail: function() {
+                    // fail
+                    console.log("chat page, onShow check websocket , fail")
+                    app.wxConnectSocket(onWebSocketOpen);
+                },
+                complete: function() {
+                    console.log("chat page, onShow check websocket , complete")
+                }
+            })
+            onWebSocketOpen();
+        }catch (e){
+            console.log("chat page, onShow check websocket catch exception , e = " + e);
+            console.log("chat page, onShow check websocket catch exception , reconnecting..." )
+            app.wxConnectSocket(onWebSocketOpen);
+        }
+          
 		
-        // 监听websocket的消息
-        wx.onSocketMessage(function(res) {
-			
-           //判断消息类型， 增加好友/批量推送未读消息/推送单条未读消息
-           console.log("chat page , websocket get message! ");
-           try{
-                var data = JSON.parse(res.data);
-                if(data.code != 10000){
-                    console.log("chat page, websocket get message, error code , code = " + data.code);
-                    return;
-                }
-                if(data.type == '2001'){
-                        // 增加好友
-                        addFriend(data.data);
-                } else if(data.type == '1001'){
-                        // 未读消息
-                        console.log("receive message ! " + data.data);
-                        receiveMessage(data.data);
-                        sendMessageRead();
-                } else if(data.type == '1002'){
-                    // 批量未读消息
-                    receiveMessages(data.data);
-                    sendMessageRead();
-                }else{
-                    console.log("chat page, websocket 返回不正常type， type = " + data.type);
-                }
-           }catch(e){
-                console.log("chat page, get websocket message, exception, e " + e);
-           }
-           
-        })
+        
        
     },
 
@@ -179,6 +212,8 @@ Page({
      * 页面切换到后台运行时，退出聊天
      */
     onHide() {
+        console.log("chat page, onHide");
+        this.setData({messages : []})
     },
 
     
@@ -191,7 +226,7 @@ Page({
 
     navigateToPerson (e){
         wx.navigateTo({
-          url: '../person/person?openId=' + friendUserInfo.openId
+          url: '../person/person?openId=' + app.globalData.currentChatFriendUserInfo.openId
         })
     },
 
@@ -203,7 +238,7 @@ Page({
         var message = {};
         message.data = {};
         message.data.fromOpenId = meUserInfo.openId;
-        message.data.toOpenId = friendUserInfo.openId;
+        message.data.toOpenId = app.globalData.currentChatFriendUserInfo.openId;
         message.data.content = e.detail.value;
 		message.data.showType = "speak"
         message.data.type = "1";
@@ -213,9 +248,11 @@ Page({
           success: function(res){
             // success
 			// 信息转圈圈的图标去掉
+            
           },
           fail: function() {
-            app.wxConnectSocket();
+            console.log("chat page, send message, fail")
+            app.wxConnectSocket(onWebSocketOpen);
           },
           complete: function() {
             // complete
