@@ -202,7 +202,11 @@ Page({
       input3: '',
       input4: '',
       popTitle: '请设置密码'
+      
     })
+    if(app.globalData && app.globalData.userInfo && app.globalData.userInfo.avatarUrl){
+      this.setData({myImage: app.globalData.userInfo.avatarUrl});
+    }
     /*
     if(redirectToWelcome) {
         wx.redirectTo({

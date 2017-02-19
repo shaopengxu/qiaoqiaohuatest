@@ -1,9 +1,11 @@
 <view class="container">
     <view class="scrollview">
         <scroll-view scroll-y="true" style="height: 500px" scroll-into-view="message_{{lastMessageId}}">
+            <!--
             <view class="date">
                 <text>2017年1月18日 15:27</text>
             </view>
+            -->
             <block wx:for="{{messages}}" wx:for-item="message" wx:key="id" >
                 <view id="message_{{message.messageId}}" class="{{message.isMe ? 'me' : 'friend'}}">
                     <block wx:if="{{message.isMe}}" >
