@@ -44,20 +44,10 @@
     text-overflow: ellipsis;
     width: 90%;
 }
-.ico-male{
+.ico-edit{
     display: inline-block;
     width: 28rpx;
     height: 28rpx;
-    background: url(/res/img/person/ico_male.png) no-repeat;
-    background-size: 100% auto;
-    vertical-align: -3rpx;
-}
-.ico-female{
-    display: inline-block;
-    width: 20rpx;
-    height: 28rpx;
-    background: url(/res/img/person/ico_female.png) no-repeat;
-    background-size: 100% auto;
     vertical-align: -3rpx;
 }
 .new-btn-white{
@@ -67,6 +57,7 @@
     border-width: 1px 0;
     background: #fff;
     font-size: 32rpx;
+    text-align: left;
 }
 .new-btn-white:after, 
 .new-btn-white:before{
@@ -95,13 +86,33 @@
     height: 44rpx;
     margin-right: 36rpx;
 }
-.link .ico-lock{
-    background: url(/res/img/person/ico_lock.png) no-repeat;
-    background-size: 100% auto;
+.new-pop-edit .pop-btnline{
+    display: flex;
 }
-.link .ico-msg{
-    background: url(/res/img/person/ico_msg.png) no-repeat;
-    background-size: 100% auto;
+.new-pop-edit .pop-title{
+    padding: 38rpx 0 18rpx;
 }
-
+.new-pop-edit .btn-left, .new-pop-edit .btn-right{
+    display: block;
+    height: 102rpx;
+    line-height: 3;
+    flex: 1;
+    border-top: 1px solid #d2d3d5;
+}
+.new-pop-edit .btn-left{
+    border-right: 1px solid #d2d3d5;
+    border-bottom-left-radius: 7px;
+}
+.new-pop-edit .btn-right{
+    border-bottom-left-radius: 7px;
+    color: #579af4;
+}
+.new-pop-edit .pop-input{
+    border:1px solid #d2d3d5;
+    height: 2;
+    margin: 0 40rpx 30rpx;
+    border-radius: 7rpx;
+    padding: 6rpx 10rpx;
+    text-align: left;
+}
 

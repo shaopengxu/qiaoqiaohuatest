@@ -25,6 +25,11 @@ page{
     background: #589AF4;
     color: #fff;
 }
+.ext-btn-red{
+    width: 100%;
+    background: #e94f4f;
+    color: #fff;
+}
 
 .hide{display: none!important;}
 .hidden{visibility: hidden!important;}
@@ -105,4 +110,116 @@ page{
   display: inline-block;
   width: 48rpx;
   height: 48rpx;
+}
+.mod-pop{
+  position: absolute;
+  left:0;
+  top:0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 9;
+}
+.mod-pop .pop-main{
+    position: absolute;
+    left: 50%;
+    top: 85rpx;
+    margin: 0 0 0 -280rpx;
+    width: 560rpx;
+    background: #fff;
+    z-index: 11;
+    text-align: center;
+    border-radius: 7rpx;
+}
+.mod-pop .pop-title{
+    display: block;
+    font-size: 36rpx;
+    line-height: 2;
+    padding: 60rpx 0 3rpx;
+}
+.mod-pop .pop-error{
+    color: #e64340;
+    font-size: 24rpx;
+    line-height: 1.5;
+}
+.mod-pop .pop-close{
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 40rpx;
+}
+.mod-pop .pop-close image{
+    width: 24rpx;
+    height: 24rpx;
+}
+.keyboard{
+    position: absolute;
+    left:0;
+    bottom:0;
+    width: 100%;
+    height: 432rpx;
+    z-index: 10;
+}
+.keyboard-img{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 750rpx;
+    height: 432rpx;
+}
+.keyboard-ico{
+    position: absolute;
+    width: 246rpx;
+    height: 108rpx;
+}
+.keyboard-img2, .keyboard-img5, .keyboard-img8, .keyboard-img0{
+    width: 260rpx;
+}
+.keyboard-img1{
+    left: 0;
+    top:0;
+}
+.keyboard-img2{
+    left: 246rpx;
+    top:0;
+}
+.keyboard-img3{
+    left: 505rpx;
+    top:0;
+}
+.keyboard-img4{
+    left: 0;
+    top:110rpx;
+}
+.keyboard-img5{
+    left: 246rpx;
+    top:110rpx;
+}
+.keyboard-img6{
+    left: 505rpx;
+    top:110rpx;
+}
+.keyboard-img7{
+    left: 0;
+    top:216rpx;
+}
+.keyboard-img8{
+    left: 246rpx;
+    top:216rpx;
+}
+.keyboard-img9{
+    left: 505rpx;
+    top:216rpx;
+}
+.keyboard-imgdot{
+    left: 0;
+    top:326rpx;
+}
+.keyboard-img0{
+    left: 246rpx;
+    top:326rpx;
+}
+.keyboard-imgdel{
+    left: 505rpx;
+    top:326rpx;
 }

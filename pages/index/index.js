@@ -99,6 +99,7 @@ function addFriend(friend){
  */
 function getFriendList() {
     try {
+        console.log("index page, get friend list");
         //先从本地获取数据
         var frs = wx.getStorageSync('friends') ||[];
         that.setData({friends : frs});
@@ -107,18 +108,34 @@ function getFriendList() {
             method: 'GET', 
             data: {sessionId: app.globalData.sessionId},
             success: function(res) {
-                that.setData({'friends': res.data.data});
-                frs = res.data.data;
-                wx.setStorageSync('friends', frs);
+                console.log("index page, get friends success, statusCode = " + res.statusCode);
+                if(res.statusCode == 200){
+                    if(res.data.code == 10000){
+                        console.log("index page, get friends, friend size = " + res.data.data.length)
+                        that.setData({'friends': res.data.data});
+                        frs = res.data.data;
+                        wx.setStorageSync('friends', frs);
 
-                // 通过邀请好友进来，直接进入聊天界面
-                if(navigateToOpenId){
-                    var friend = app.getFriendByOpenId(friends, navigateToOpenId);
-                    wx.navigateTo({ url: '../chat/chat?openId=' + friend.friendOpenId
-                        + "&nickName=" + friend.friendNickName + "&image=" + friend.friendImage});
+                        // 通过邀请好友进来，直接进入聊天界面
+                        if(navigateToOpenId) {
+                            var friend = app.getFriendByOpenId(friends, navigateToOpenId);
+                            wx.navigateTo({ url: '../chat/chat?openId=' + friend.friendOpenId
+                                + "&nickName=" + friend.friendNickName + "&image=" + friend.friendImage});
+                        }
+                    }else{
+                        console.log("index page, get friends , return code is not success");
+                        wx.showToast({title: "获取好友服务器返回失败，请稍后重试", icon:"error", duration: 1000})
+                        return
+                    }
+                }else{
+                    wx.showToast({title: "获取好友服务器返回异常，请稍后重试", icon:"error", duration: 1000})
+                    return;
                 }
+                
             },
             fail: function() {
+                console.log("index page, get friends fail")
+                wx.showToast({title: "获取好友服务器出错，请稍后重试", icon:"error", duration: 1000})
                 app.failHandle();
             },
             complete: function() {
@@ -127,7 +144,7 @@ function getFriendList() {
         })
 
     } catch (e) {
-        console.log("exception, e " + e);
+        console.log("index page, get friends, exception, e " + e);
 		app.failHandle();
     }
 }
@@ -140,6 +157,9 @@ Page({
     },
 
     onLoad: function (data) {
+        if(data){
+            console.log("index page onload data.navigateToOpenId = " + data.navigateToOpenId);
+        }
         that = this;
         if(data && data.navigateToOpenId) {
             navigateToOpenId = data.navigateToOpenId;
@@ -147,7 +167,6 @@ Page({
         if(!app.socketOpen){
             app.wxConnectSocket();
         }
-        
     },
 
     onShow: function() {
@@ -156,18 +175,29 @@ Page({
         // 监听websocket的消息
         wx.onSocketMessage(function(res) {
            //判断消息类型， 增加好友/批量推送未读消息/推送单条未读消息
-           console.log("websocket get message! data = " + res.data);
-           var data = JSON.parse(res.data);
-           if(data.type == '2001'){
-                // 增加好友
-                addFriend(data.data);
-           } else if(data.type == '1001'){
-                // 未读消息
-                receiveMessage(data.data);
-           } else if(data.type == '1002'){
-               // 批量未读消息
-                receiveMessages(data.data || []);
+           console.log("index page, websocket get message!");
+           try{
+                var data = JSON.parse(res.data);
+                if(data.code != 10000) {
+                    console.log("index page, websocket get message, error code , code = " + data.code);
+                    return;
+                }
+                if(data.type == '2001'){
+                        // 增加好友
+                        addFriend(data.data);
+                } else if(data.type == '1001'){
+                        // 未读消息
+                        receiveMessage(data.data);
+                } else if(data.type == '1002'){
+                    // 批量未读消息
+                        receiveMessages(data.data || []);
+                } else {
+                    console.log("index page, websocket 返回不正常type， type = " + data.type);
+                }
+           }catch(e){
+                console.log("index page, get websocket message, exception, e " + e);
            }
+           
         })
         // 更新发出邀请消息
         this.setData({hasInvite: app.globalData.hasInvite});

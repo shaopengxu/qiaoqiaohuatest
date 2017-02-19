@@ -12,18 +12,26 @@ var currentFocus = 1;
    * 输入密码
    */
   function inputPassword(password) {
-
-    if(backGround && urlAfterFromBackGround){
+    console.log("password page, inputPassword, password = " + password + ", backGround = " + backGround)
+    if(backGround && urlAfterFromBackGround) {
         backGround = false;
-        if(password == app.globalData.userInfo.password){
-          console.log("from password redirect to ... " + urlAfterFromBackGround);
-            wx.redirectTo({
-              url: urlAfterFromBackGround + "?fromBackGround=true"
-            })
-            return;
-        }else{
+        if(!app.globalData.userInfo.password) {
+          console.log("password page, inputPassword, backGroud = true, but app.globalData.userInfo.password = null, redirect to root page");
+          //返回到welcome page
+          wx.navigateBack({
+            delta: 100
+          })
+          return ;
+        }
+        if(password == app.globalData.userInfo.password) {
+          console.log("password page, inputPassword, backGround = true, from password redirect to ... " + urlAfterFromBackGround);
+          wx.redirectTo({
+            url: urlAfterFromBackGround + "?fromBackGround=true"
+          })
+          return;
+        } else {
           wx.showToast({
-            title: '密码错误',
+            title: '登陆密码错误',
             icon: 'error',
             duration: 10000
           })
@@ -32,28 +40,8 @@ var currentFocus = 1;
     }
     console.log("password page isFirst  " + app.globalData.isFirst + " sessionId = " + app.globalData.sessionId + " needAddFriend " + needAddFriend)
     if(app.globalData.isFirst) {
-      // 注册用户
-      wx.request({
-        url: http_server + '/weixin/register',
-        data: {password: password, sessionId: app.globalData.sessionId},
-        method: 'GET', 
-        success: function(res) {
-          app.globalData.isLogin = true;
-          app.globalData.userInfo.password = password;
-          if(needAddFriend){
-              app.addInvitorToFriend(loginSuccess);
-          }else{
-            loginSuccess()
-          }
-        },
-        fail: function() {
-          // fail
-        },
-        complete: function() {
-          // complete
-        }
-      })
-
+      // 逻辑错误
+      console.log("password page, error , user need register password, not login password")
     }else{
       wx.request({
         url: http_server + '/weixin/login',
@@ -62,12 +50,23 @@ var currentFocus = 1;
         // header: {}, // 设置请求的 header
         success: function(res){
           //TODO 判断是否登录成功
-
-          app.globalData.isLogin = true;
-          app.globalData.userInfo.password = password;
-          
-          if(needAddFriend){
-              app.addInvitorToFriend(loginSuccess);
+          console.log("password page, http login success, statusCode = " + res.statusCode);
+          if(res.statusCode == 200) {
+            console.log("password page, http login success, field success = " + res.data.data.success);
+            if(res.data.data.success) {
+              app.globalData.isLogin = true;
+              app.globalData.userInfo.password = password;
+            }else {
+              wx.showToast({title: "密码错误", icon:"error", duration: 1000})
+              currentFocus ++;
+              return; 
+            }
+          }else{
+            wx.showToast({title: "登陆服务器返回异常，请稍后重试", icon:"error", duration: 1000})
+            return ;
+          }
+          if(needAddFriend) {
+            app.addInvitorToFriend(loginSuccess);
           }else{
             loginSuccess()
           }
@@ -75,6 +74,9 @@ var currentFocus = 1;
         },
         fail: function() {
           // fail
+          console.log("password page, http login fail ");
+          wx.showToast({title: "登陆服务器出错，请稍后重试", icon:"error", duration: 1000})
+          return ;
         },
         complete: function() {
           // complete
@@ -118,17 +120,18 @@ Page({
     input2: '',
     input3: '',
     input4: '',
-    tip:"密码输入错误超过5次，请10分钟后重新尝试"
+    tip: ''
+    //"密码输入错误超过5次，请10分钟后重新尝试"
   },
   onLoad:function(data) {
-      console.log("password page needAddFriend " + data.needAddFriend);
-      if(data && data.backGround){
-         console.log("back ground " + data.backGround);
+      if(data) {
+        console.log("password page onLoad, data.needAddFriend = " + data.needAddFriend + ", data.backGround = " + data.backGround);
+      }
+      if(data && data.backGround) {
          backGround = data.backGround;
          urlAfterFromBackGround = data.url;
       }
-      if(data && data.needAddFriend){
-
+      if(data && data.needAddFriend) {
         needAddFriend = data.needAddFriend;
       }
   },
@@ -136,6 +139,14 @@ Page({
     // 页面渲染完成
   },
   onShow:function(){
+    currentFocus = 1;
+    password = '';
+    this.setData({
+      input1: '',
+      input2: '',
+      input3: '',
+      input4: ''
+    })
     
   },
   onHide:function(){
@@ -149,7 +160,6 @@ Page({
     password = password + "1";
     if(currentFocus == 4){
       inputPassword(password);
-      currentFocus = 0
     }else{
       currentFocus ++;
     }
@@ -160,7 +170,7 @@ Page({
     password = password + "2";
     if(currentFocus == 4){
       inputPassword(password);
-      currentFocus = 0
+     
     }else{
       currentFocus ++;
     }
@@ -171,7 +181,7 @@ Page({
     password = password + "3";
     if(currentFocus == 4){
       inputPassword(password);
-      currentFocus = 0
+      
     }else{
       currentFocus ++;
     }
@@ -182,7 +192,7 @@ Page({
     password = password + "4";
     if(currentFocus == 4){
       inputPassword(password);
-      currentFocus = 0
+      
     }else{
       currentFocus ++;
     }
@@ -193,7 +203,7 @@ Page({
     password = password + "5";
     if(currentFocus == 4){
       inputPassword(password);
-      currentFocus = 0
+     
     }else{
       currentFocus ++;
     }
@@ -204,7 +214,7 @@ Page({
     password = password + "6";
     if(currentFocus == 4){
       inputPassword(password);
-      currentFocus = 0
+      
     }else{
       currentFocus ++;
     }
@@ -215,7 +225,7 @@ Page({
     password = password + "7";
     if(currentFocus == 4){
       inputPassword(password);
-      currentFocus = 0
+      
     }else{
       currentFocus ++;
     }
@@ -226,7 +236,7 @@ Page({
     password = password + "8";
     if(currentFocus == 4){
       inputPassword(password);
-      currentFocus = 0
+     
     }else{
       currentFocus ++;
     }
@@ -237,7 +247,7 @@ Page({
     password = password + "9";
     if(currentFocus == 4){
       inputPassword(password);
-      currentFocus = 0
+    
     }else{
       currentFocus ++;
     }
@@ -248,7 +258,7 @@ Page({
     password = password + "0";
     if(currentFocus == 4){
       inputPassword(password);
-      currentFocus = 0
+     
     }else{
       currentFocus ++;
     }
@@ -258,6 +268,8 @@ Page({
     if(currentFocus > 1){
       currentFocus --;
       updateField(this, "");
+      password = password.substr(0, password.length -1 );
+      console.log("password page , click del password = " + password)
     }
   },
   clickdot: function(){

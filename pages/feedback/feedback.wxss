@@ -1,0 +1,20 @@
+.container{
+    padding: 0;
+    background: #efeff4;
+}
+.form{
+    width: 100%;
+    padding: 30rpx 0 0;
+}
+.form .textarea{
+    width: 100%;
+    font-size: 32rpx;
+    line-height: 1.6;
+    border-top: 1px solid #d8d8d8;
+    border-bottom: 1px solid #d8d8d8;
+    color: #b5b5b5;
+    padding: 20rpx 40rpx;
+    box-sizing: border-box;
+    text-align: justify;
+    background: #fff;
+}

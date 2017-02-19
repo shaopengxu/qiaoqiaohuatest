@@ -8,5 +8,36 @@
     <view class="mod-btn-line">
         <button class="mod-btn ext-btn-blue new-btn-blue" bindtap="startme">开始密语</button>
     </view>
+    <view class="mod-pop" style="{{showPassword}}">
+        <view class="pop-main">
+            <text class="pop-title">{{popTitle}}</text>
+            <text class="pop-error" style="{{popError}}">两次输入密码不一致，请重新输入</text><!--显示错误加去掉class "hidden"-->
+            
+            <view class="inputbox">
+                <view class="input"><text>{{input1}}</text></view>
+                <view class="input"><text>{{input2}}</text></view>
+                <view class="input"><text>{{input3}}</text></view>
+                <view class="input"><text>{{input4}}</text></view>
+            </view>
+            <view class="pop-close" bindtap="closePassword"><image src="/res/img/password/pop_close.png"></image></view>
+        </view>
+    </view>
+    <view class="keyboard" style="{{showPassword}}">
+        <image class="keyboard-img" src="/res/img/password/keyboard.png"></image>
+        <view class="keyboard-ico keyboard-img1" bindtap="click1"></view>
+        <view class="keyboard-ico keyboard-img2" bindtap="click2"></view>
+        <view class="keyboard-ico keyboard-img3" bindtap="click3"></view>
+        <view class="keyboard-ico keyboard-img4" bindtap="click4"></view>
+        <view class="keyboard-ico keyboard-img5" bindtap="click5"></view>
+        <view class="keyboard-ico keyboard-img6" bindtap="click6"></view>
+        <view class="keyboard-ico keyboard-img7" bindtap="click7"></view>
+        <view class="keyboard-ico keyboard-img8" bindtap="click8"></view>
+        <view class="keyboard-ico keyboard-img9" bindtap="click9"></view>
+        <view class="keyboard-ico keyboard-imgdot" bindtap="clickdot"></view>
+        <view class="keyboard-ico keyboard-img0" bindtap="click0"></view>
+        <view class="keyboard-ico keyboard-imgdel" bindtap="clickdel"></view>
+    </view>
    </view>
+   
+   
 </view>

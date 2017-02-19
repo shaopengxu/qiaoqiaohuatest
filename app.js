@@ -1,6 +1,7 @@
 //app.js
 App({
-  firstTime: false,
+  
+
   getUserInfo:function(cb){
     var that = this
     if(this.globalData.userInfo){
@@ -11,15 +12,26 @@ App({
         success: function (response) {
           wx.getUserInfo({
             success: function (res) {
-              console.log("ws.login return code = " + response.code);
-              console.log("ws.getUserInfo return encryptedData " + res.encryptedData);
+              //console.log("ws.login return code = " + response.code);
+              //console.log("ws.getUserInfo return encryptedData " + res.encryptedData);
+              console.log("wx.getUserInfo success");
               that.globalData.userInfo = res.userInfo
               that.globalData.encryptedData = res.encryptedData
               that.globalData.iv = res.iv
               that.globalData.code = response.code
+              that.globalData.userAuth = true;
               typeof cb == "function" && cb(that.globalData.userInfo)
+              
+            },
+            fail:function(){
+              console.log("wx.getUserInfo fail");
+              that.globalData.userAuth = false;
             }
           })
+        },
+        fail: function(){
+          console.log("wx.login fail");
+          that.globalData.userAuth = false
         }
       })
     }
@@ -39,14 +51,15 @@ App({
   },
 
   onLaunch: function () {
-    this.firstTime = true;
+    this.globalData.firstTime = true;
   },
 
   onShow(){
-    if(!this.firstTime){
+    if(!this.globalData.firstTime){
+      // 从后台返回
       var pages = getCurrentPages();
-      //如果是welcome page， 就不需要进入密码页
-      if(pages.length <= 1){
+      //如果是welcome page，或者密码页， 就不需要进入密码页
+      if(pages.length <= 1 || pages[pages.length-1].__route__.contains("password")){
         return ;
       }
       
@@ -64,7 +77,7 @@ App({
         }
       })
     }
-    this.firstTime =false;
+    this.globalData.firstTime =false;
 
   },
 
@@ -100,46 +113,56 @@ App({
   /**
  * 邀请好友
  */
-addInvitorToFriend: function(callbackFunc){
+addInvitorToFriend: function(callbackFunc) {
   var http_server = require("config.js").http_server;
   var that = this;
-  console.log("addInvitorToFriend   in line 63");
+  console.log("app.js addInvitorToFriend friend: " + this.globalData.friend);
   if(this.globalData.friend){
-    console.log("addInvitorToFriend   in line 65");
+    
     wx.request({
       url: http_server + '/weixin/add_friend',
       data: {friendOpenId: this.globalData.friend.openId, sessionId: this.globalData.sessionId},
       method: 'GET',
-      success: function(res){
+      success: function(res) {
         // success
-        that.globalData.res =res;
-        callbackFunc()
-
+        console.log("app.js, http add friend success, statusCode = " + res.statusCode);
+        if(res.statusCode == 200){
+          console.log("add friend result code = " + res.data.code); 
+          callbackFunc()
+        }else{
+          wx.showToast({title: "添加好友服务器返回异常，请稍后重试", icon: "error", duration: 1000})
+        }
       },
       fail: function() {
         // fail
-      },
-      complete: function() {
-        
+        console.log("app.js, http add friend fail");
+        wx.showToast({title: "添加好友服务器出错，请稍后重试", icon: "error", duration: 1000})
       }
     })
   }
 },
   
   failHandle: function(){
+    
 		wx.showToast({
 		  title: '连接断开，请重新登录',
 		  icon: 'error',
 		  duration: 2000
 		});
 		wx.navigateBack({
-      delta: 1
+      delta: 100
     });
   },
 
   websocketOpen: function(){
     var that =this;
     wx.onSocketOpen(function() {
+          console.log("websocket open");
+          wx.onSocketError(function() {
+              // 重连websocket
+              console.log("websocket error, reconnect");
+              //wxConnectSocket();
+          })
           //websocket登录
           var message = {};
           message.type = "1";
@@ -148,10 +171,11 @@ addInvitorToFriend: function(callbackFunc){
           wx.sendSocketMessage({
           data: JSON.stringify(message),
           success: function(res) {
-
+              console.log("websocket login success!");
           },
           fail: function() {
               // fail
+              console.log("websocket login fail!");
           },
           complete: function() {
               // complete
@@ -164,8 +188,9 @@ addInvitorToFriend: function(callbackFunc){
     var that = this;
     var websocket_server = require("config.js").ws_server;
       //连接websocket
+      console.log("websocket connecting");
       wx.connectSocket({
-        url: websocket_server ,
+        url: websocket_server,
         data: {},
         header:{ 
         'content-type': 'application/json'
@@ -174,13 +199,10 @@ addInvitorToFriend: function(callbackFunc){
         success: function(res){
             that.socketOpen = true;
             that.websocketOpen();
-            wx.onSocketError(function() {
-                // 重连websocket
-                console.log("websocket error, reconnect");
-                //wxConnectSocket();
-            })
+            
         },
         fail: function() {
+          console.log("websocket connect fail")
           that.failHandle();
         },
         complete: function() {
@@ -190,7 +212,7 @@ addInvitorToFriend: function(callbackFunc){
    },
   
   globalData:{
-    isFirst: true,
+    isFirst: true, // 是否注册过
     userInfo: null,
     sessionId: null,
     isLogin: false,
@@ -199,9 +221,10 @@ addInvitorToFriend: function(callbackFunc){
     iv: null,
     code: null,
     friend: null,
-    res: null,
     socketOpen : false,
-    hasInivte : false
+    hasInivte : false,
+    userAuth: true, // 用户授权
+    firstTime: false,  // 判断是否从后台返回
   },
   client:null
 })

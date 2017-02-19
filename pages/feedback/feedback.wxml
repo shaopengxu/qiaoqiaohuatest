@@ -1,0 +1,8 @@
+<view class="container">
+   <view class="form">
+    <textarea class="textarea" placeholder="请提出您对朋友密语的宝贵一键，我们将全力以赴做到最好！" />
+   </view>
+   <view class="mod-btn-line">
+    <button class="mod-btn ext-btn-blue">提交反馈</button>
+   </view>
+</view>

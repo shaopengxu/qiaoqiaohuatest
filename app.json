@@ -1,12 +1,13 @@
 {
   "pages":[
-    
     "pages/welcome/welcome",
+    "pages/invite_friend/invite_friend",
+    
     "pages/password/password",
     "pages/index/index",
     "pages/me/me",
     "pages/chat/chat",
-    "pages/invite_friend/invite_friend",
+    "pages/feedback/feedback",
     "pages/person/person"
     
   ],

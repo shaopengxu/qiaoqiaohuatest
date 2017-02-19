@@ -106,8 +106,8 @@ Page({
         })
     },
 
-    onLoad(query) {
-        friendUserInfo = query;
+    onLoad(data) {
+        friendUserInfo = data;
 		meUserInfo = app.globalData.userInfo;
 		that = this;
         
@@ -139,21 +139,32 @@ Page({
         wx.onSocketMessage(function(res) {
 			
            //判断消息类型， 增加好友/批量推送未读消息/推送单条未读消息
-           console.log("chat page , websocket get message! data = " + res.data);
-           var data = JSON.parse(res.data);
-           if(data.type == '2001'){
-                // 增加好友
-                addFriend(data.data);
-           } else if(data.type == '1001'){
-                // 未读消息
-                console.log("receive message ! " + data.data);
-                receiveMessage(data.data);
-                sendMessageRead();
-           } else if(data.type == '1002'){
-               // 批量未读消息
-               receiveMessages(data.data);
-               sendMessageRead();
+           console.log("chat page , websocket get message! ");
+           try{
+                var data = JSON.parse(res.data);
+                if(data.code != 10000){
+                    console.log("chat page, websocket get message, error code , code = " + data.code);
+                    return;
+                }
+                if(data.type == '2001'){
+                        // 增加好友
+                        addFriend(data.data);
+                } else if(data.type == '1001'){
+                        // 未读消息
+                        console.log("receive message ! " + data.data);
+                        receiveMessage(data.data);
+                        sendMessageRead();
+                } else if(data.type == '1002'){
+                    // 批量未读消息
+                    receiveMessages(data.data);
+                    sendMessageRead();
+                }else{
+                    console.log("chat page, websocket 返回不正常type， type = " + data.type);
+                }
+           }catch(e){
+                console.log("chat page, get websocket message, exception, e " + e);
            }
+           
         })
        
     },
