@@ -59,7 +59,7 @@ App({
       // 从后台返回
       var pages = getCurrentPages();
       //如果是welcome page，或者密码页， 就不需要进入密码页
-      if(pages.length <= 1 || pages[pages.length-1].__route__.contains("password")){
+      if(pages.length <= 1 || pages[pages.length-1].__route__.indexOf("password") >= 0){
         return ;
       }
       
