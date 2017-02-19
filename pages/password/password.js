@@ -30,6 +30,7 @@ var currentFocus = 1;
           })
           return;
         } else {
+          currentFocus++;
           wx.showToast({
             title: '登陆密码错误',
             icon: 'error',
