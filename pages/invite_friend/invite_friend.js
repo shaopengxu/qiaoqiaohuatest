@@ -7,20 +7,6 @@ var password = '';
 var password1 = '';
 var currentFocus = 1;
 
-
-
-function updateField(that, number){
-    if(currentFocus == 1){
-      that.setData({"input1": number, popError: "display:none"});
-    }else if(currentFocus == 2){
-      that.setData({"input2": number, popError: "display:none"});
-    }else if(currentFocus == 3){
-      that.setData({"input3": number, popError: "display:none"});
-    }else if(currentFocus == 4){
-      that.setData({"input4": number, popError: "display:none"});
-    }
-  }
-
   /**
    * 输入密码
    */
@@ -107,7 +93,8 @@ Page({
     popTitle: '请设置登录密码',
     popError: 'display:none',
     myImage: '',
-    taImage: ''
+    taImage: '',
+    focus: false
   },
 
   closePassword: function(){
@@ -127,12 +114,39 @@ Page({
   },
 
   onLoad: function (data) {
+    
     if(data && data.openId) {
       var that = this;
       console.log("invite_friend page, data.openId = " + data.openId + ", data.image = " + data.image);
       this.setData({invite: false, taImage: data.image})
       app.globalData.friend = data;
+      var userInfo = wx.getStorageSync('userInfo');
+      if(userInfo && userInfo.openId){
+        app.globalData.userInfo = userInfo;
+        app.globalData.isFirst = false;
+        that.setData({myImage: app.globalData.userInfo.avatarUrl})
+        if(data.openId == userInfo.openId){
+          console.log("invite_friend page, onload invite myself");
+          wx.redirectTo({
+            url: '../password/password'
+          })
+          return ;
+        }
+        
+        var friends = wx.getStorageSync('friends')
+        if(friends && app.getFriendIndexFromList(friends, data.openId) >= 0){
+          //好友存在 
+          console.log("invite_friend page, onload friend exists");
+          wx.redirectTo({
+            url: '../password/password'
+          })
+          return ;
+        }
+        return ;
+      }
       app.getUserInfo(function(userInfo){
+        //首次接受邀请，很重要
+        //TOOD userAuth判断
         //更新数据
         wx.request({
           url: http_server + '/weixin/check_user_info',
@@ -151,28 +165,12 @@ Page({
             if(res.data.data.openId == app.globalData.friend.openId){
               console.log("invite page, invite myself");
               app.globalData.friend = null;
-              wx.showToast({
-                title: '不能邀请自己为好友',
-                icon: 'error',
-                duration: 1000
-              });
+              app.globalData.errorMessage = '不能邀请自己为好友';
               setTimeout(function (){
                 wx.redirectTo({
-                  url: '../welcome/welcome',
-                  success: function(res){
-                    // success
-                    console.log("invite page, invite myself, redirectTo welcome success");
-                  },
-                  fail: function() {
-                    // fail
-                    console.log("invite page, invite myself, redirectTo welcome failed");
-                  },
-                  complete: function() {
-                    // complete
-                  }
+                  url: '../password/password'
                 })
               }, 1000);
-              
               return ;
             }
           },
@@ -215,6 +213,10 @@ Page({
     }
     */
   },
+  makeFocus: function(){
+    this.setData({focus:false});
+    this.setData({focus:true});
+  },
   onShareAppMessage: function () {
         app.globalData.hasInvite = true;
         setTimeout(function (){
@@ -236,130 +238,51 @@ Page({
          })
           //app.addInvitorToFriend();
        }else{
-         this.setData({showPassword: ""})
-
-         
+         this.setData({showPassword: "", focus: true})
        }
    },
-   click1: function(){
-    updateField(this, "1");
-    password = password + "1";
-    if(currentFocus == 4){
+   inputNumber: function(e){
+    password = e.detail.value.length > 4 ? e.detail.value.substring(0, 4): e.detail.value;
+    if(password.length == 1 ){
+      this.setData({
+        input1: password[0],
+        input2: '',
+        input3: '',
+        input4: ''
+      })
+    }else if(password.length == 2){
+      this.setData({
+        input1: '*',
+        input2: password[1],
+        input3: '',
+        input4: ''
+      })
+    }else if(password.length == 3){
+      this.setData({
+        input1: '*',
+        input2: '*',
+        input3: password[2],
+        input4: ''
+      })
+    }else if(password.length == 4){
+      this.setData({
+        input1: '*',
+        input2: '*',
+        input3: '*',
+        input4: password[3]
+      })
       inputPassword(this);
-    }else{
-      currentFocus ++;
+    }else if(password.length == 0){
+      this.setData({
+        input1: '',
+        input2: '',
+        input3: '',
+        input4: ''
+      })
     }
-    
-  },
-  click2: function(){
-    updateField(this, "2");
-    password = password + "2";
-    if(currentFocus == 4){
-      inputPassword(this);
-      
-    }else{
-      currentFocus ++;
+    return {
+      value: password
     }
-    
-  },
-  click3: function(){
-    updateField(this, "3");
-    password = password + "3";
-    if(currentFocus == 4){
-      inputPassword(this);
-     
-    }else{
-      currentFocus ++;
-    }
-    
-  },
-  click4: function(){
-    updateField(this, "4");
-    password = password + "4";
-    if(currentFocus == 4){
-      inputPassword(this);
-      
-    }else{
-      currentFocus ++;
-    }
-    
-  },
-  click5: function(){
-    updateField(this, "5");
-    password = password + "5";
-    if(currentFocus == 4){
-      inputPassword(this);
-      
-    }else{
-      currentFocus ++;
-    }
-    
-  },
-  click6: function(){
-    updateField(this, "6");
-    password = password + "6";
-    if(currentFocus == 4){
-      inputPassword(this);
-     
-    }else{
-      currentFocus ++;
-    }
-    
-  },
-  click7: function(){
-    updateField(this, "7");
-    password = password + "7";
-    if(currentFocus == 4){
-      inputPassword(this);
-     
-    }else{
-      currentFocus ++;
-    }
-    
-  },
-  click8: function(){
-    updateField(this, "8");
-    password = password + "8";
-    if(currentFocus == 4){
-      inputPassword(this);
-      
-    }else{
-      currentFocus ++;
-    }
-    
-  },
-  click9: function(){
-    updateField(this, "9");
-    password = password + "9";
-    if(currentFocus == 4){
-      inputPassword(this);
-  
-    }else{
-      currentFocus ++;
-    }
-    
-  },
-  click0: function(){
-    updateField(this, "0");
-    password = password + "0";
-    if(currentFocus == 4){
-      inputPassword(this);
-     
-    }else{
-      currentFocus ++;
-    }
-    
-  },
-  clickdel: function(){
-    if(currentFocus > 1){
-      currentFocus --;
-      updateField(this, "");
-      password = password.substr(0, password.length -1 );
-      console.log("password page , click del password = " + password)
-    }
-  },
-  clickdot: function(){
-
   }
 
 })

@@ -119,6 +119,7 @@ function getFriendList() {
                         // 通过邀请好友进来，直接进入聊天界面
                         if(navigateToOpenId) {
                             var friend = app.getFriendByOpenId(frs, navigateToOpenId);
+                            navigateToOpenId = null;
                             wx.navigateTo({ url: '../chat/chat?openId=' + friend.friendOpenId
                                 + "&nickName=" + friend.friendNickName + "&image=" + friend.friendImage});
                         }

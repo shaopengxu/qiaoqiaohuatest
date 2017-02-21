@@ -47,6 +47,7 @@ function inputPassword(that) {
         if(res.statusCode == 200) {
           app.globalData.isLogin = true;
           app.globalData.userInfo.password = password;
+          
           wx.redirectTo({
               url: '../index/index'
           })
@@ -78,17 +79,6 @@ function inputPassword(that) {
   
 }
 
-function updateField(that, number){
-    if(currentFocus == 1){
-      that.setData({"input1": number, popError: " "});
-    }else if(currentFocus == 2){
-      that.setData({"input2": number, popError: " "});
-    }else if(currentFocus == 3){
-      that.setData({"input3": number, popError: " "});
-    }else if(currentFocus == 4){
-      that.setData({"input4": number, popError: " "});
-    }
-  }
 
 Page({
   data: {
@@ -111,10 +101,15 @@ Page({
     //this.setData({showPassword: "", focus: true})
     
     if(!app.globalData.userAuth){
-        wx.showToast({
-          title: '用户授权失败',
-          icon: 'error',
-          duration: 1000
+        wx.showModal({
+          title: '提示',
+          showCancel: false,
+          content: '用户授权失败，请重新进入',
+          success: function(res) {
+            if (res.confirm) {
+              console.log('用户点击确定')
+            }
+          }
         })
         return;
     }
@@ -144,16 +139,20 @@ Page({
   },
   onLoad: function () {
     var that = this
-    
+    var userInfo = wx.getStorageSync('userInfo');
+    if(userInfo && userInfo.openId){
+      app.globalData.userInfo = userInfo;
+      app.globalData.isFirst = false;
+      wx.redirectTo({
+        url: '../password/password'
+      })
+      return ;
+    }
     //调用应用实例的方法获取全局数据
     app.getUserInfo(function(userInfo){
       if(!app.globalData.userAuth){
         console.log("welcome init getUserInfo 用户授权失败")
-        wx.showToast({
-          title: '用户授权失败',
-          icon: 'error',
-          duration: 1000
-        })
+        app.globalData.errorMessage = "用户授权失败";
         return;
       }
       //请求服务器 该用户是否已经登陆过
@@ -168,6 +167,7 @@ Page({
             app.globalData.isFirst = res.data.data.isFirst;
             app.globalData.userInfo.openId = res.data.data.openId;
             app.globalData.sessionId = res.data.data.sessionId;
+            wx.setStorageSync('userInfo', app.globalData.userInfo);
             if(app.globalData.isFirst) {
               wx.clearStorageSync();
             }else{
@@ -177,21 +177,13 @@ Page({
               return ;
             }
           }else{
-            wx.showToast({
-              title: '用户信息服务器返回异常，请稍后重试',
-              icon: 'error',
-              duration: 1000
-            })
+            app.globalData.errorMessage = "服务器异常，请稍后重试";
           }
         },
         fail: function() {
           // fail
           console.log("welcome page, http check_user_info fail")
-          wx.showToast({
-            title: '用户信息服务器出错，请稍后重试 == ',
-            icon: 'error',
-            duration: 1000
-          })
+          app.globalData.errorMessage = "网络异常，请稍后重试";
         },
         complete: function() {
           // complete
@@ -228,25 +220,26 @@ Page({
       })
     }else if(password.length == 2){
       this.setData({
-        input1: password[0],
+        input1: '*',
         input2: password[1],
         input3: '',
         input4: ''
       })
     }else if(password.length == 3){
       this.setData({
-        input1: password[0],
-        input2: password[1],
+        input1: '*',
+        input2: '*',
         input3: password[2],
         input4: ''
       })
     }else if(password.length == 4){
       this.setData({
-        input1: password[0],
-        input2: password[1],
-        input3: password[2],
+        input1: '*',
+        input2: '*',
+        input3: '*',
         input4: password[3]
       })
+      inputPassword(this);
     }else if(password.length == 0){
       this.setData({
         input1: '',
