@@ -1,6 +1,5 @@
 //app.js
 App({
-  
 
   getUserInfo:function(cb){
     var that = this
@@ -35,6 +34,73 @@ App({
         }
       })
     }
+  },
+
+  checkUserInfo: function(callback) {
+    var userInfo = wx.getStorageSync('userInfo');
+    if(userInfo && userInfo.openId){
+      this.globalData.userInfo = userInfo;
+      this.globalData.isFirst = false;
+      if(callback){
+        callback();
+        return;
+      }else {
+        wx.redirectTo({
+          url: '/pages/password/password'
+        })
+        return ;
+      }
+      
+    }
+    //调用应用实例的方法获取全局数据
+    this.getUserInfo(function(userInfo){
+      if(!this.globalData.userAuth){
+        console.log("welcome init getUserInfo 用户授权失败")
+        this.globalData.errorMessage = "用户授权失败";
+        return;
+      }
+      //请求服务器 该用户是否已经登陆过
+      wx.request({
+        url: http_server + '/weixin/check_user_info',
+        data: {encryptedData: this.globalData.encryptedData, iv: this.globalData.iv, code: this.globalData.code, nickName: userInfo.nickName,
+             avatarUrl: userInfo.avatarUrl},
+        method: 'GET', 
+        success: function(res){
+          console.log("welcome page, http check_user_info success, statusCode = " + res.statusCode);
+          if(res.statusCode == 200){
+            this.globalData.isFirst = res.data.data.isFirst;
+            this.globalData.userInfo.openId = res.data.data.openId;
+            this.globalData.sessionId = res.data.data.sessionId;
+            wx.setStorageSync('userInfo', this.globalData.userInfo);
+            if(app.globalData.isFirst) {
+              wx.clearStorageSync();
+            }else{
+              if(callback){
+                callback();
+                return;
+              }else{
+                wx.redirectTo({
+                  url: '../password/password'
+                })
+                return ;
+              }
+             
+            }
+          }else{
+            this.globalData.errorMessage = "服务器异常，请稍后重试";
+          }
+        },
+        fail: function() {
+          // fail
+          console.log("welcome page, http check_user_info fail")
+          this.globalData.errorMessage = "网络异常，请稍后重试";
+        },
+        complete: function() {
+          // complete
+        }
+      })
+      
+    })
   },
 
   getFriendByOpenId: function(friends, openId) {

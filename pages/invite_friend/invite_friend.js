@@ -114,74 +114,29 @@ Page({
   },
 
   onLoad: function (data) {
-    
+    var that = this;
     if(data && data.openId) {
-      var that = this;
+      
       console.log("invite_friend page, data.openId = " + data.openId + ", data.image = " + data.image);
       this.setData({invite: false, taImage: data.image})
       app.globalData.friend = data;
-      var userInfo = wx.getStorageSync('userInfo');
-      if(userInfo && userInfo.openId){
-        app.globalData.userInfo = userInfo;
-        app.globalData.isFirst = false;
-        that.setData({myImage: app.globalData.userInfo.avatarUrl})
-        if(data.openId == userInfo.openId){
-          console.log("invite_friend page, onload invite myself");
+      
+      app.chekcUserInfo(function(){
+        if(openId == app.globalData.userInfo.openId){
           wx.redirectTo({
             url: '../password/password'
           })
-          return ;
+          return;
         }
-        
-        var friends = wx.getStorageSync('friends')
-        if(friends && app.getFriendIndexFromList(friends, data.openId) >= 0){
-          //好友存在 
-          console.log("invite_friend page, onload friend exists");
+        var f = getFriendByOpenId(wx.getStorageSync('friends'), data.openId);
+        if(f){
           wx.redirectTo({
-            url: '../password/password'
+            url: '../password/password?directToOpenId=' + data.openId
           })
-          return ;
+          return;
         }
-        return ;
-      }
-      app.getUserInfo(function(userInfo){
-        //首次接受邀请，很重要
-        //TOOD userAuth判断
-        //更新数据
-        wx.request({
-          url: http_server + '/weixin/check_user_info',
-          data: {encryptedData: app.globalData.encryptedData, iv: app.globalData.iv, code: app.globalData.code, nickName: userInfo.nickName,
-              avatarUrl: userInfo.avatarUrl},
-          method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
-          // header: {}, // 设置请求的 header
-          success: function(res){
-            app.globalData.isFirst = res.data.data.isFirst;
-            app.globalData.userInfo.openId = res.data.data.openId;
-            app.globalData.sessionId = res.data.data.sessionId;
-            that.setData({myImage: app.globalData.userInfo.avatarUrl})
-            if(app.globalData.isFirst) {
-              wx.clearStorageSync();
-            }
-            if(res.data.data.openId == app.globalData.friend.openId){
-              console.log("invite page, invite myself");
-              app.globalData.friend = null;
-              app.globalData.errorMessage = '不能邀请自己为好友';
-              setTimeout(function (){
-                wx.redirectTo({
-                  url: '../password/password'
-                })
-              }, 1000);
-              return ;
-            }
-          },
-          fail: function() {
-            // fail
-          },
-          complete: function() {
-            // complete
-          }
-        })
-      })
+      });
+      
     }else if(data && data.inviteFriend){
       this.setData({invite: true, myImage: app.globalData.userInfo.avatarUrl}) 
     }else if(data && data.fromBackGround){
@@ -204,6 +159,9 @@ Page({
     })
     if(app.globalData && app.globalData.userInfo && app.globalData.userInfo.avatarUrl){
       this.setData({myImage: app.globalData.userInfo.avatarUrl});
+    }
+    if(app.globalData.friend && app.globalData.friend.image){
+      this.setData({taImage: app.globalData.friend.image})
     }
     /*
     if(redirectToWelcome) {

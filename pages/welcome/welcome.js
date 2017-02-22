@@ -92,11 +92,17 @@ Page({
     focus : false
   },
 
+  /**
+   * 弹出数字框
+   */
   makeFocus: function(){
     this.setData({focus:false});
     this.setData({focus:true});
   },
 
+  /**
+   * 点击“开始密语”
+   */
   startme:function(){
     //this.setData({showPassword: "", focus: true})
     
@@ -116,7 +122,7 @@ Page({
     if(app.globalData.isFirst){
       this.setData({showPassword: "", focus: true})
     }else{
-      wx.navigateTo({
+      wx.redirectTo({
         url: '../password/password'
       })
     }
@@ -139,58 +145,7 @@ Page({
   },
   onLoad: function () {
     var that = this
-    var userInfo = wx.getStorageSync('userInfo');
-    if(userInfo && userInfo.openId){
-      app.globalData.userInfo = userInfo;
-      app.globalData.isFirst = false;
-      wx.redirectTo({
-        url: '../password/password'
-      })
-      return ;
-    }
-    //调用应用实例的方法获取全局数据
-    app.getUserInfo(function(userInfo){
-      if(!app.globalData.userAuth){
-        console.log("welcome init getUserInfo 用户授权失败")
-        app.globalData.errorMessage = "用户授权失败";
-        return;
-      }
-      //请求服务器 该用户是否已经登陆过
-      wx.request({
-        url: http_server + '/weixin/check_user_info',
-        data: {encryptedData: app.globalData.encryptedData, iv: app.globalData.iv, code: app.globalData.code, nickName: userInfo.nickName,
-             avatarUrl: userInfo.avatarUrl},
-        method: 'GET', 
-        success: function(res){
-          console.log("welcome page, http check_user_info success, statusCode = " + res.statusCode);
-          if(res.statusCode == 200){
-            app.globalData.isFirst = res.data.data.isFirst;
-            app.globalData.userInfo.openId = res.data.data.openId;
-            app.globalData.sessionId = res.data.data.sessionId;
-            wx.setStorageSync('userInfo', app.globalData.userInfo);
-            if(app.globalData.isFirst) {
-              wx.clearStorageSync();
-            }else{
-              wx.redirectTo({
-                url: '../password/password'
-              })
-              return ;
-            }
-          }else{
-            app.globalData.errorMessage = "服务器异常，请稍后重试";
-          }
-        },
-        fail: function() {
-          // fail
-          console.log("welcome page, http check_user_info fail")
-          app.globalData.errorMessage = "网络异常，请稍后重试";
-        },
-        complete: function() {
-          // complete
-        }
-      })
-      
-    })
+    app.checkUserInfo();
   },
 
   onShow: function(){
